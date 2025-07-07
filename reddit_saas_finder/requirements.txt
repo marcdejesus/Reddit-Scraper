@@ -35,4 +35,6 @@ PyYAML
 pytest
 
 # pytest-cov - for measuring code coverage
-pytest-cov 
+pytest-cov
+
+# python-dotenv - for managing environment variables 

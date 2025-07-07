@@ -1,5 +1,6 @@
 import yaml
 import os
+from dotenv import load_dotenv
 
 from reddit_saas_finder.src.data.database import DB_PATH
 
@@ -9,13 +10,19 @@ class ConfigManager:
     """Manages configuration for the application."""
 
     def __init__(self, config_path=CONFIG_PATH):
+        load_dotenv(dotenv_path=".env.local")
         self.config = self._load_config(config_path)
 
     def _load_config(self, config_path):
-        """Loads the YAML configuration file."""
+        """Loads the YAML configuration file and substitutes environment variables."""
         try:
             with open(config_path, "r") as f:
-                return yaml.safe_load(f)
+                # Read the raw yaml file
+                raw_config = f.read()
+                # Substitute environment variables
+                expanded_config = os.path.expandvars(raw_config)
+                # Parse the expanded yaml
+                return yaml.safe_load(expanded_config)
         except FileNotFoundError:
             print(f"Error: Configuration file not found at {config_path}")
             raise

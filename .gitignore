@@ -1,2 +1,4 @@
 .cursorrules
 .env.local
+# Local environment variables
+.env.local

@@ -1,6 +1,6 @@
 reddit:
-  client_id: "your_client_id"
-  client_secret: "your_client_secret"
+  client_id: "${REDDIT_CLIENT_ID}"
+  client_secret: "${REDDIT_CLIENT_SECRET}"
   user_agent: "reddit_saas_finder/1.0"
   rate_limit: 60
   retry_attempts: 5
