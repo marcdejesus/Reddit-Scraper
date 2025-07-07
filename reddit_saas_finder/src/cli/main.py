@@ -7,7 +7,8 @@ from reddit_saas_finder.src.cli import (
     opportunities, 
     visualization, 
     config as config_cli,
-    keywords as keywords_cli
+    keywords as keywords_cli,
+    export as export_cli
 )
 
 app = typer.Typer(help="Reddit SaaS Opportunity Finder CLI")
@@ -18,6 +19,7 @@ app.add_typer(opportunities.app, name="opportunities", help="Generate and score 
 app.add_typer(visualization.app, name="show", help="Display data in tables and charts.")
 app.add_typer(config_cli.app, name="config", help="Manage application configuration.")
 app.add_typer(keywords_cli.app, name="keywords", help="Manage custom keywords for NLP processing.")
+app.add_typer(export_cli.app, name="export", help="Export data and generate reports.")
 
 @app.command()
 def init_db():

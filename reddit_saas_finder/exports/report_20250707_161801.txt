@@ -1,0 +1,24 @@
+==================================================
+ Reddit SaaS Opportunity Finder - Summary Report
+==================================================
+Report Generated: 2025-07-07T16:18:01.205952
+
+[Summary Statistics]
+  - Total Opportunities Found: 1
+  - Total Pain Points Detected: 1
+  - Top Category: productivity
+
+[Top 5 Opportunities]
+  - ID: 1, Title: Test Opportunity, Score: 0.900
+
+
+[Category Distribution]
+  - productivity: 10
+  - communication: 5
+
+
+[Trend Analysis]
+  - Trending Topic: AI in copywriting
+  - Growth: 25%
+
+==================================================
