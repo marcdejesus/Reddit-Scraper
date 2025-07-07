@@ -34,13 +34,14 @@ def scrape(
 
 @app.command()
 def process(
-    analyze_pain_points: bool = typer.Option(False, "--analyze-pain-points", help="Run the pain point detection and analysis pipeline.")
+    analyze_pain_points: bool = typer.Option(False, "--analyze-pain-points", help="Run the pain point detection and analysis pipeline."),
+    advanced: bool = typer.Option(False, "--advanced", help="Use the advanced transformer-based NLP model for higher accuracy.")
 ):
     """Processes the NLP pipeline."""
     if analyze_pain_points:
         print("[bold green]Starting NLP processing for pain points...[/bold green]")
         try:
-            process_pain_points()
+            process_pain_points(use_advanced_detector=advanced)
             print("[bold green]Pain point processing completed successfully.[/bold green]")
         except Exception as e:
             print(f"[bold red]An error occurred during NLP processing: {e}[/bold red]")

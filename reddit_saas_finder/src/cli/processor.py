@@ -5,20 +5,24 @@ from datetime import datetime
 from rich.progress import track
 
 from reddit_saas_finder.src.data.database import DB_PATH
-from reddit_saas_finder.src.nlp.pain_detector import PainDetector
+from reddit_saas_finder.src.nlp.pain_detector import BasicPainDetector, AdvancedPainDetector
 from reddit_saas_finder.src.nlp.categorizer import Categorizer
 from reddit_saas_finder.src.nlp.scorer import SentimentScorer
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def process_pain_points():
+def process_pain_points(use_advanced_detector: bool = False):
     """
     Reads posts and comments from the database, processes them to find pain points,
     and saves the pain points back to the database.
     """
-    logging.info("Starting pain point processing...")
+    logging.info(f"Starting pain point processing... (Advanced Detector: {use_advanced_detector})")
     
-    pain_detector = PainDetector()
+    if use_advanced_detector:
+        pain_detector = AdvancedPainDetector()
+    else:
+        pain_detector = BasicPainDetector()
+        
     categorizer = Categorizer()
     scorer = SentimentScorer()
 
@@ -48,7 +52,7 @@ def process_pain_points():
                         pp['content'],
                         category,
                         severity,
-                        0.85, # Placeholder for confidence_score
+                        pp.get('confidence', 0.85), # Use confidence from advanced detector if available
                         datetime.utcnow()
                     ))
             
