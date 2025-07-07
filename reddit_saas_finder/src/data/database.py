@@ -189,6 +189,22 @@ CREATE TABLE IF NOT EXISTS opportunities (
 );
 """
 
+def create_indexes(connection):
+    """Creates indexes on frequently queried columns to improve performance."""
+    cursor = connection.cursor()
+    console.print("Creating database indexes for performance...")
+    try:
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_posts_processed ON posts(processed);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_comments_processed ON comments(processed);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_comments_post_id ON comments(post_id);")
+        connection.commit()
+        console.print("[bold green]Database indexes created successfully.[/bold green]")
+    except Exception as e:
+        console.print(f"[bold red]Error creating indexes: {e}[/bold red]")
+        connection.rollback()
+    finally:
+        cursor.close()
+
 def get_db_connection(db_path: str = DB_PATH):
     """Establishes a connection to the SQLite database.
 
@@ -206,38 +222,29 @@ def get_db_connection(db_path: str = DB_PATH):
     return conn
 
 def initialize_database(connection=None):
-    """Initializes the database by creating all necessary tables if they don't exist.
-
-    This function executes the `CREATE TABLE IF NOT EXISTS` statements for posts,
-    comments, pain_points, and opportunities.
-
-    Args:
-        connection (sqlite3.Connection, optional): An existing database connection.
-            If not provided, a new connection will be created and closed.
-            Defaults to None.
-    """
+    """Initializes the database by creating tables and indexes if they don't exist."""
     
-    if connection:
-        conn = connection
-        using_external_connection = True
-    else:
-        console.print(f"Initializing database at [cyan]{DB_PATH}[/cyan]...")
-        conn = get_db_connection()
-        using_external_connection = False
+    close_conn = False
+    if connection is None:
+        os.makedirs(DB_DIR, exist_ok=True)
+        connection = get_db_connection()
+        close_conn = True
 
     try:
-        cursor = conn.cursor()
+        cursor = connection.cursor()
         cursor.execute(POSTS_SCHEMA)
         cursor.execute(COMMENTS_SCHEMA)
         cursor.execute(PAIN_POINTS_SCHEMA)
         cursor.execute(OPPORTUNITIES_SCHEMA)
-        conn.commit()
-    finally:
-        if not using_external_connection:
-            conn.close()
+        connection.commit()
+        cursor.close()
 
-    if not using_external_connection:
-        console.print("[green]Database initialized successfully.[/green]")
+        # Create indexes after ensuring tables exist
+        create_indexes(connection)
+
+    finally:
+        if close_conn:
+            connection.close()
 
 
 # --- Data Access Functions ---
