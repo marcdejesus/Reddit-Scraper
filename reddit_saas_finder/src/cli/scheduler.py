@@ -13,7 +13,11 @@ def start(
     interval: int = typer.Option(None, "--interval", help="Interval in hours for running the scraper. Overrides config.")
 ):
     """
-    Starts the background scheduler.
+    Starts the background scheduler to run tasks at a specified interval.
+
+    This command daemonizes a process that periodically runs the data scraping
+    and processing pipeline. The interval can be set via the `--interval` option
+    or configured in the `default.yaml` file.
     """
     config_manager = ConfigManager()
     config = config_manager.config
@@ -28,7 +32,10 @@ def start(
 @app.command()
 def stop():
     """
-    Stops the background scheduler.
+    Stops the background scheduler if it is running.
+
+    This command finds the process ID (PID) of the running scheduler
+    and terminates it.
     """
     console.print("[bold cyan]Stopping scheduler...[/bold cyan]")
     scheduler = TaskScheduler()
@@ -37,7 +44,10 @@ def stop():
 @app.command()
 def status():
     """
-    Checks the status of the scheduler.
+    Checks and reports the current status of the background scheduler.
+
+    This will check if the scheduler process is currently running and
+    report its status.
     """
     console.print("[bold cyan]Checking scheduler status...[/bold cyan]")
     scheduler = TaskScheduler()

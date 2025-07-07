@@ -15,7 +15,16 @@ def export(
     output: str = typer.Option(None, "--output", "-o", help="The name of the output file."),
 ):
     """
-    Export opportunities or pain points to a file.
+    Exports generated data to various file formats.
+
+    This command allows you to export either the generated opportunities or the
+    detected pain points into formats like CSV, JSON, or YAML.
+
+    Args:
+        opportunities (bool): Flag to export opportunities.
+        pain_points (bool): Flag to export pain points.
+        format (str): The desired output format.
+        output (str): Optional name for the output file.
     """
     if not opportunities and not pain_points:
         print("[bold red]Error: Please specify what to export, e.g., --opportunities or --pain-points[/bold red]")
@@ -38,7 +47,16 @@ def report(
     output: str = typer.Option(None, "--output", "-o", help="The name of the output file."),
 ):
     """
-    Generate a summary report of the findings.
+    Generates a summary report of the analysis findings.
+
+    This command creates a text or JSON report summarizing the key insights,
+    such as top opportunities and common pain points.
+
+    Args:
+        summary (bool): Flag to generate a summary report.
+        comprehensive (bool): Flag for a more detailed report (not implemented).
+        format (str): The desired report format.
+        output (str): Optional name for the output file.
     """
     if comprehensive:
         print("[bold yellow]Warning: Comprehensive report is not yet implemented. Generating a summary report instead.[/bold yellow]")

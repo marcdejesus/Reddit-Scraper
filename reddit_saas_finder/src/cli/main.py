@@ -12,7 +12,8 @@ from cli import (
     trends as trends_cli,
     validator as validator_cli,
     optimizer as optimizer_cli,
-    scheduler as scheduler_cli
+    scheduler as scheduler_cli,
+    docs as docs_cli
 )
 from data.database import get_db_connection
 
@@ -29,6 +30,7 @@ app.add_typer(trends_cli.app, name="trends", help="Analyze trends in opportuniti
 app.add_typer(validator_cli.app, name="validate", help="Validate data quality.")
 app.add_typer(optimizer_cli.app, name="optimize", help="Optimize performance.")
 app.add_typer(scheduler_cli.app, name="schedule", help="Schedule background tasks.")
+app.add_typer(docs_cli.app, name="docs", help="Generate API documentation.")
 
 @app.command()
 def init_db():

@@ -12,9 +12,26 @@ DB_DIR = "reddit_saas_finder/data"
 DB_PATH = os.path.join(DB_DIR, "reddit_data.db")
 
 # --- Data Models ---
-# These classes represent the data structures for our application, matching the database schema.
 class Post:
+    """Represents a Reddit post."""
     def __init__(self, id: str, subreddit: str, title: str, content: Optional[str], author: Optional[str], score: int, num_comments: int, created_utc: float, url: str, flair: Optional[str], is_self: bool, upvote_ratio: float, processed: bool = False, **kwargs):
+        """Initializes a Post object.
+
+        Args:
+            id (str): The unique ID of the post.
+            subreddit (str): The subreddit the post belongs to.
+            title (str): The title of the post.
+            content (Optional[str]): The text content of the post.
+            author (Optional[str]): The author of the post.
+            score (int): The score of the post.
+            num_comments (int): The number of comments on the post.
+            created_utc (float): The UTC timestamp of when the post was created.
+            url (str): The URL of the post.
+            flair (Optional[str]): The flair of the post.
+            is_self (bool): Whether the post is a self-post.
+            upvote_ratio (float): The upvote ratio of the post.
+            processed (bool): Whether the post has been processed.
+        """
         self.id = id
         self.subreddit = subreddit
         self.title = title
@@ -30,7 +47,22 @@ class Post:
         self.processed = bool(processed)
 
 class Comment:
+    """Represents a Reddit comment."""
     def __init__(self, id: str, post_id: str, content: str, author: Optional[str], score: int, created_utc: float, parent_id: str, depth: int, is_submitter: bool, processed: bool = False, **kwargs):
+        """Initializes a Comment object.
+
+        Args:
+            id (str): The unique ID of the comment.
+            post_id (str): The ID of the post the comment belongs to.
+            content (str): The text content of the comment.
+            author (Optional[str]): The author of the comment.
+            score (int): The score of the comment.
+            created_utc (float): The UTC timestamp of when the comment was created.
+            parent_id (str): The ID of the parent comment or post.
+            depth (int): The depth of the comment in the thread.
+            is_submitter (bool): Whether the comment author is the post submitter.
+            processed (bool): Whether the comment has been processed.
+        """
         self.id = id
         self.post_id = post_id
         self.content = content
@@ -43,7 +75,15 @@ class Comment:
         self.processed = bool(processed)
 
 class PainPoint:
+    """Represents a pain point extracted from a post or comment."""
     def __init__(self, source_id: str, source_type: str, content: str, **kwargs):
+        """Initializes a PainPoint object.
+
+        Args:
+            source_id (str): The ID of the source post or comment.
+            source_type (str): The type of the source ('post' or 'comment').
+            content (str): The text content of the pain point.
+        """
         self.source_id = source_id
         self.source_type = source_type
         self.content = content
@@ -58,7 +98,18 @@ class PainPoint:
         self.engagement_score: Optional[float] = kwargs.get('engagement_score')
 
 class Opportunity:
+    """Represents a potential SaaS opportunity."""
     def __init__(self, id: int, title: str, description: str, category: str, total_score: float, pain_point_count: int, **kwargs):
+        """Initializes an Opportunity object.
+
+        Args:
+            id (int): The unique ID of the opportunity.
+            title (str): The title of the opportunity.
+            description (str): The description of the opportunity.
+            category (str): The category of the opportunity.
+            total_score (float): The total score of the opportunity.
+            pain_point_count (int): The number of pain points associated with the opportunity.
+        """
         self.id = id
         self.title = title
         self.description = description
@@ -139,7 +190,15 @@ CREATE TABLE IF NOT EXISTS opportunities (
 """
 
 def get_db_connection(db_path: str = DB_PATH):
-    """Establishes a connection to the SQLite database."""
+    """Establishes a connection to the SQLite database.
+
+    Args:
+        db_path (str, optional): The path to the database file. 
+            Defaults to DB_PATH.
+
+    Returns:
+        sqlite3.Connection: A connection object to the database.
+    """
     if db_path != ":memory:":
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
     conn = sqlite3.connect(db_path)
@@ -147,7 +206,16 @@ def get_db_connection(db_path: str = DB_PATH):
     return conn
 
 def initialize_database(connection=None):
-    """Initializes the database and creates tables."""
+    """Initializes the database by creating all necessary tables if they don't exist.
+
+    This function executes the `CREATE TABLE IF NOT EXISTS` statements for posts,
+    comments, pain_points, and opportunities.
+
+    Args:
+        connection (sqlite3.Connection, optional): An existing database connection.
+            If not provided, a new connection will be created and closed.
+            Defaults to None.
+    """
     
     if connection:
         conn = connection
@@ -175,7 +243,15 @@ def initialize_database(connection=None):
 # --- Data Access Functions ---
 
 def save_posts_and_comments(posts: List[Dict[str, Any]], comments: List[Dict[str, Any]]):
-    """Saves posts and comments to the database, ignoring duplicates."""
+    """Saves posts and their corresponding comments to the database in a single transaction.
+
+    This function performs a bulk `INSERT OR IGNORE` operation, so existing records
+    are not updated.
+
+    Args:
+        posts (List[Dict[str, Any]]): A list of dictionaries, each representing a post.
+        comments (List[Dict[str, Any]]): A list of dictionaries, each representing a comment.
+    """
     with get_db_connection() as conn:
         cursor = conn.cursor()
         
@@ -191,21 +267,36 @@ def save_posts_and_comments(posts: List[Dict[str, Any]], comments: List[Dict[str
         console.print(f"Saved {cursor.rowcount} new items to the database.")
 
 def get_unprocessed_posts() -> List[Post]:
-    """Fetches all posts that have not been processed yet."""
+    """Fetches all posts from the database that have not yet been processed.
+
+    Returns:
+        List[Post]: A list of Post objects.
+    """
     with get_db_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM posts WHERE processed = 0")
         return [Post(**row) for row in cursor.fetchall()]
 
 def get_unprocessed_comments() -> List[Comment]:
-    """Fetches all comments that have not been processed yet."""
+    """Fetches all comments from the database that have not yet been processed.
+
+    Returns:
+        List[Comment]: A list of Comment objects.
+    """
     with get_db_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM comments WHERE processed = 0")
         return [Comment(**row) for row in cursor.fetchall()]
 
 def save_pain_points(pain_points: List[PainPoint]):
-    """Saves a list of PainPoint objects to the database and marks sources as processed."""
+    """Saves a list of PainPoint objects to the database.
+
+    After saving the pain points, this function also marks the source posts
+    and comments as processed to avoid duplicate processing.
+
+    Args:
+        pain_points (List[PainPoint]): A list of PainPoint objects to save.
+    """
     if not pain_points:
         return
         
@@ -228,14 +319,24 @@ def save_pain_points(pain_points: List[PainPoint]):
         conn.commit()
 
 def get_pain_points() -> List[Dict[str, Any]]:
-    """Retrieves all pain points from the database."""
+    """Retrieves all pain points from the database.
+
+    Returns:
+        List[Dict[str, Any]]: A list of dictionaries, where each dictionary
+            represents a pain point.
+    """
     with get_db_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM pain_points")
         return [dict(row) for row in cursor.fetchall()]
 
 def save_opportunities(opportunities: List[Dict[str, Any]]):
-    """Saves a list of opportunity dictionaries to the database."""
+    """Saves a list of opportunity dictionaries to the database.
+
+    Args:
+        opportunities (List[Dict[str, Any]]): A list of dictionaries, each
+            representing an opportunity.
+    """
     opp_data = [(o['title'], o['description'], o['category'], o.get('market_score', 0), o['frequency_score'], o['willingness_to_pay_score'], o['total_score'], o['pain_point_count'], o.get('pain_point_ids', '[]')) for o in opportunities]
     with get_db_connection() as conn:
         cursor = conn.cursor()
@@ -243,23 +344,43 @@ def save_opportunities(opportunities: List[Dict[str, Any]]):
         conn.commit()
 
 def get_opportunities(limit: int = 20) -> List[Opportunity]:
-    """Retrieves opportunities from the database, ordered by score."""
+    """Retrieves opportunities from the database, ordered by total score.
+
+    Args:
+        limit (int, optional): The maximum number of opportunities to retrieve.
+            Defaults to 20.
+
+    Returns:
+        List[Opportunity]: A list of Opportunity objects.
+    """
     with get_db_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM opportunities ORDER BY total_score DESC LIMIT ?", (limit,))
         return [Opportunity(**row) for row in cursor.fetchall()]
 
 def get_category_distribution() -> List[Tuple[str, int]]:
-    """Calculates the distribution of opportunities across categories."""
+    """Gets the distribution of opportunities across different categories.
+
+    Returns:
+        List[Tuple[str, int]]: A list of tuples, where each tuple contains
+            a category name and the count of opportunities in that category.
+    """
     with get_db_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT category, COUNT(*) as count FROM opportunities GROUP BY category ORDER BY count DESC")
-        return [(row['category'], row['count']) for row in cursor.fetchall()] 
+        cursor.execute("SELECT category, COUNT(*) FROM opportunities GROUP BY category")
+        return cursor.fetchall()
 
 def get_subreddit_for_post(post_id: str) -> Optional[str]:
-    """Retrieves the subreddit for a given post ID."""
+    """Gets the subreddit for a given post ID.
+
+    Args:
+        post_id (str): The ID of the post.
+
+    Returns:
+        Optional[str]: The name of the subreddit, or None if not found.
+    """
     with get_db_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT subreddit FROM posts WHERE id = ?", (post_id,))
-        row = cursor.fetchone()
-        return row['subreddit'] if row else None 
+        result = cursor.fetchone()
+        return result['subreddit'] if result else None 

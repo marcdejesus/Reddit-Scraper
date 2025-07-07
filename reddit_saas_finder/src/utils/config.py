@@ -12,15 +12,38 @@ SUBREDDITS_PATH = "reddit_saas_finder/config/subreddits.yaml"
 console = Console()
 
 class ConfigManager:
-    """Manages configuration for the application."""
+    """
+    Manages loading and accessing configuration from YAML files and environment variables.
+
+    This class handles reading the main configuration (`default.yaml`), subreddit
+    lists (`subreddits.yaml`), and substituting environment variables for secrets.
+    """
 
     def __init__(self, config_path=CONFIG_PATH):
+        """Initializes the ConfigManager.
+
+        Loads the main config and subreddit config files. It also loads environment
+        variables from a `.env.local` file if it exists.
+
+        Args:
+            config_path (str, optional): The path to the main configuration file.
+                Defaults to CONFIG_PATH.
+        """
         load_dotenv(dotenv_path=".env.local")
         self.config = self._load_config(config_path)
         self.subreddits_config = self._load_config(SUBREDDITS_PATH)
 
     def _load_config(self, config_path):
-        """Loads a YAML configuration file and substitutes environment variables."""
+        """
+        Loads a single YAML configuration file and substitutes environment variables.
+
+        Args:
+            config_path (str): The path to the YAML file.
+
+        Returns:
+            dict or None: The loaded configuration as a dictionary, or None if
+                          an error occurred.
+        """
         try:
             with open(config_path, "r") as f:
                 raw_config = f.read()
@@ -34,7 +57,13 @@ class ConfigManager:
             return None
 
     def get_reddit_credentials(self):
-        """Returns Reddit API credentials."""
+        """
+        Retrieves the Reddit API credentials from the configuration.
+
+        Returns:
+            tuple: A tuple containing the client_id, client_secret, and user_agent.
+                   Returns (None, None, None) if not found.
+        """
         if self.config and 'reddit' in self.config:
             return (
                 self.config['reddit'].get('client_id'),
@@ -44,23 +73,48 @@ class ConfigManager:
         return None, None, None
 
     def get_database_path(self):
-        """Returns the path to the SQLite database."""
+        """
+        Returns the configured path to the SQLite database.
+
+        Returns:
+            str: The database file path.
+        """
         return DB_PATH
         
     def get_data_collection_config(self):
-        """Returns the data collection configuration."""
+        """
+        Returns the 'data_collection' section of the configuration.
+
+        Returns:
+            dict: The data collection configuration dictionary, or an empty dict.
+        """
         return self.config.get('data_collection', {}) if self.config else {}
 
     def get_nlp_config(self):
-        """Returns the NLP configuration."""
+        """
+        Returns the 'nlp' section of the configuration.
+
+        Returns:
+            dict: The NLP configuration dictionary, or an empty dict.
+        """
         return self.config.get('nlp', {}) if self.config else {}
 
     def get_scoring_config(self):
-        """Returns the scoring configuration."""
+        """
+        Returns the 'scoring' section of the configuration.
+
+        Returns:
+            dict: The scoring configuration dictionary, or an empty dict.
+        """
         return self.config.get('scoring', {}) if self.config else {}
 
     def load_subreddits(self):
-        """Loads primary and secondary subreddits from subreddits.yaml."""
+        """
+        Loads the lists of primary and secondary subreddits from the config.
+
+        Returns:
+            tuple: A tuple containing two lists: (primary_subreddits, secondary_subreddits).
+        """
         if self.subreddits_config and 'subreddits' in self.subreddits_config:
             return (
                 self.subreddits_config['subreddits'].get('primary', []),
@@ -69,7 +123,14 @@ class ConfigManager:
         return [], []
     
     def get_raw_config_text(self):
-        """Returns the raw text content of the config files."""
+        """
+        Returns the raw text content of the main and subreddit config files.
+
+        This is useful for displaying the original configuration to the user.
+
+        Returns:
+            tuple: A tuple containing the raw string content of (main_config, subreddit_config).
+        """
         raw_main = ""
         raw_subreddits = ""
         try:

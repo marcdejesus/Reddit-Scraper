@@ -15,9 +15,18 @@ console = Console()
 
 class BasicPainDetector:
     """
-    Detects pain points in text using keyword matching and NLP.
+    Detects pain points in text using keyword matching and basic NLP.
+
+    This detector uses a predefined list of keywords and regular expressions
+    to identify sentences that likely express a user pain point. It serves as a
+    fast, baseline method for pain point extraction.
     """
     def __init__(self):
+        """Initializes the BasicPainDetector.
+
+        This will load the necessary spaCy model, downloading it if not present,
+        and load the pain point keywords.
+        """
         try:
             self.nlp = spacy.load("en_core_web_sm")
         except OSError:
@@ -32,6 +41,13 @@ class BasicPainDetector:
     def extract_pain_points(self, text: str):
         """
         Extracts sentences that contain pain point indicators.
+
+        Args:
+            text (str): The text to analyze.
+
+        Returns:
+            list: A list of dictionaries, where each dictionary represents a
+                  detected pain point and includes the content and the matched pattern.
         """
         pain_points = []
         doc = self.nlp(text)
@@ -48,9 +64,20 @@ class BasicPainDetector:
 
 class AdvancedPainDetector(BasicPainDetector):
     """
-    Detects pain points using a pre-trained transformer model for more accuracy.
+    An enhanced pain point detector that uses a transformer-based model.
+
+    This class first uses keyword matching to find candidate sentences and then
+    runs a sentiment analysis model on them to determine if they represent a
+    negative sentiment, which is a strong indicator of a pain point. This
+    improves accuracy over the basic keyword-only approach.
     """
     def __init__(self):
+        """Initializes the AdvancedPainDetector.
+
+        Loads the spaCy model and a pre-trained sentiment analysis model from
+        Hugging Face's Transformers library. If the transformer model fails to
+        load, it gracefully falls back to the basic detector's functionality.
+        """
         super().__init__()
         self.optimizer = PerformanceOptimizer()
         try:
@@ -66,8 +93,19 @@ class AdvancedPainDetector(BasicPainDetector):
 
     def extract_pain_points(self, text: str):
         """
-        Overrides the basic method to use the advanced transformer-based approach.
-        If the advanced model is unavailable, it falls back to the parent's method.
+        Extracts pain points using a hybrid approach of keyword matching and
+        transformer-based sentiment analysis.
+
+        It first identifies sentences with potential pain point keywords and then
+        uses a sentiment analysis model to confirm negative sentiment before
+        classifying it as a pain point.
+
+        Args:
+            text (str): The text to analyze.
+
+        Returns:
+            list: A list of dictionaries for each confirmed pain point, including
+                  content and confidence score.
         """
         if not self.sentiment_classifier:
             return super().extract_pain_points(text)

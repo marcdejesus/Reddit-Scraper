@@ -10,13 +10,25 @@ CACHE_DIR = "reddit_saas_finder/cache"
 class PerformanceOptimizer:
     """
     Provides caching and batch processing functionalities to improve performance.
+
+    This class helps to reduce redundant computations by caching NLP results
+    and manages memory usage by processing data in smaller batches.
     """
     def __init__(self):
+        """Initializes the PerformanceOptimizer, ensuring the cache directory exists."""
         os.makedirs(CACHE_DIR, exist_ok=True)
 
     def get_cached_nlp_result(self, text: str) -> any:
         """
-        Retrieves a cached NLP result for the given text.
+        Retrieves a cached NLP result for the given text, if available.
+
+        The cache key is the MD5 hash of the text.
+
+        Args:
+            text (str): The text for which to retrieve a cached result.
+
+        Returns:
+            any: The cached result, or None if not found in the cache.
         """
         text_hash = hashlib.md5(text.encode()).hexdigest()
         cache_file = os.path.join(CACHE_DIR, f"{text_hash}.pkl")
@@ -29,7 +41,13 @@ class PerformanceOptimizer:
 
     def cache_nlp_result(self, text: str, result: any):
         """
-        Caches the NLP result for the given text.
+        Caches the result of an NLP operation for a given text.
+
+        The text is hashed to create a filename for the cached result.
+
+        Args:
+            text (str): The input text for the NLP operation.
+            result (any): The result of the NLP operation to be cached.
         """
         text_hash = hashlib.md5(text.encode()).hexdigest()
         cache_file = os.path.join(CACHE_DIR, f"{text_hash}.pkl")
@@ -39,7 +57,7 @@ class PerformanceOptimizer:
 
     def clear_cache(self):
         """
-        Clears all cached NLP results.
+        Clears all cached NLP results from the cache directory.
         """
         for filename in os.listdir(CACHE_DIR):
             file_path = os.path.join(CACHE_DIR, filename)
@@ -49,8 +67,14 @@ class PerformanceOptimizer:
 
     def batch_process_pain_points(self, batch_size: int = 100):
         """
-        Processes unprocessed posts and comments in batches.
-        This is a placeholder and should be integrated with the actual NLP processor.
+        Processes unprocessed posts and comments in batches to conserve memory.
+
+        This method retrieves all unprocessed data and iterates through it in
+        smaller batches, running the pain point detection on each batch.
+
+        Args:
+            batch_size (int, optional): The number of items to process in a
+                single batch. Defaults to 100.
         """
         from data.database import get_unprocessed_posts, get_unprocessed_comments, save_pain_points, get_subreddit_for_post
         from nlp.pain_detector import AdvancedPainDetector

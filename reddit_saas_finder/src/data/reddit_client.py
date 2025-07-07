@@ -11,9 +11,19 @@ console = Console()
 
 class RedditClient:
     """
-    Manages all interactions with the Reddit API using PRAW.
+    Manages all interactions with the Reddit API using the PRAW library.
+
+    This class handles the authentication with Reddit, fetching posts and comments,
+    and coordinating with the database module to save the scraped data.
     """
     def __init__(self):
+        """
+        Initializes the RedditClient.
+
+        It fetches API credentials from the configuration and sets up a PRAW instance.
+        Raises:
+            ValueError: If Reddit API credentials are not found in the configuration.
+        """
         config_manager = ConfigManager()
         client_id, client_secret, user_agent = config_manager.get_reddit_credentials()
         
@@ -31,7 +41,15 @@ class RedditClient:
 
     def scrape_subreddit(self, subreddit_name: str, time_filter: str = 'week', limit: int = 100) -> None:
         """
-        Scrapes posts and their top comments from a given subreddit and saves them to the database.
+        Scrapes posts and their top comments from a given subreddit.
+
+        The scraped data is then passed to the database module for storage.
+
+        Args:
+            subreddit_name (str): The name of the subreddit to scrape (e.g., 'SaaS').
+            time_filter (str, optional): The time filter for sorting top posts
+                ('all', 'year', 'month', 'week', 'day'). Defaults to 'week'.
+            limit (int, optional): The maximum number of posts to scrape. Defaults to 100.
         """
         console.print(f"Scraping r/{subreddit_name} (time: {time_filter}, limit: {limit})...", style="bold blue")
         subreddit = self.reddit.subreddit(subreddit_name)

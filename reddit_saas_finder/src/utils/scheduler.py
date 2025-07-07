@@ -14,15 +14,22 @@ STATUS_FILE = os.path.join(PID_DIR, "scheduler_status.log")
 
 class TaskScheduler:
     """
-    Manages scheduled scraping and processing tasks.
+    Manages the background scheduling of data scraping and processing tasks.
+
+    This class handles starting, stopping, and checking the status of a recurring
+    background job that runs the main data pipeline.
     """
     def __init__(self):
+        """Initializes the TaskScheduler, ensuring the run directory exists."""
         os.makedirs(PID_DIR, exist_ok=True)
 
     def run_scraping_and_processing(self):
         """
-        A placeholder for the actual scraping and processing logic.
-        This should call the necessary functions from the scraper and processor.
+        The core task executed by the scheduler.
+
+        This function runs the data pipeline, which includes scraping new data
+        and processing it to find pain points. It also logs the status of each
+        run to a status file.
         """
         from utils.performance import PerformanceOptimizer
         
@@ -42,7 +49,14 @@ class TaskScheduler:
 
     def start(self, interval_hours: int):
         """
-        Starts the scheduler as a background process.
+        Starts the scheduler as a long-running foreground process.
+
+        This method is intended to be run as a background task by the user (e.g.,
+        using `&` in the shell). It registers the main task to run at the
+        specified interval.
+
+        Args:
+            interval_hours (int): The interval in hours at which to run the task.
         """
         if os.path.exists(PID_FILE):
             console.print("[yellow]Scheduler is already running.[/yellow]")
@@ -72,7 +86,7 @@ class TaskScheduler:
     
     def stop(self):
         """
-        Stops the scheduler.
+        Stops a running scheduler process by reading its PID and sending a signal.
         """
         if not os.path.exists(PID_FILE):
             console.print("[yellow]Scheduler is not running.[/yellow]")
@@ -96,7 +110,10 @@ class TaskScheduler:
 
     def get_status(self):
         """
-        Gets the status of the scheduler.
+        Checks if the scheduler is running and displays its status.
+
+        It checks for the existence of the PID file and whether the process
+        is active. It also displays the content of the last run's status file.
         """
         if not os.path.exists(PID_FILE):
             console.print("[bold red]Scheduler is not running.[/bold red]")

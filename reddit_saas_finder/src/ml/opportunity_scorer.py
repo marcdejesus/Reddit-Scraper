@@ -15,15 +15,30 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 class OpportunityScorer:
     """
-    Generates and scores opportunities from processed pain points.
+    Analyzes and scores potential SaaS opportunities based on pain points.
+
+    This class groups similar pain points, calculates various scores
+    (market, frequency, willingness to pay), and generates a final
+    opportunity score.
     """
     def __init__(self):
+        """Initializes the OpportunityScorer."""
         # The db_path is no longer needed here as we use data access functions.
         pass
 
     def _group_similar_pain_points(self, pain_points, similarity_threshold=0.7):
         """
-        Groups similar pain points together using TF-IDF and cosine similarity.
+        Groups similar pain points using TF-IDF and cosine similarity.
+
+        This helps to identify underlying themes and aggregate related user problems.
+
+        Args:
+            pain_points (list): A list of pain point dictionaries.
+            similarity_threshold (float, optional): The threshold for grouping.
+                Defaults to 0.7.
+
+        Returns:
+            list: A list of groups, where each group is a list of pain points.
         """
         if not pain_points:
             return []
@@ -61,7 +76,16 @@ class OpportunityScorer:
 
     def _calculate_market_score(self, pain_point_group):
         """
-        Calculates market size score based on frequency, reach, and subreddit diversity.
+        Calculates a market score for a group of pain points.
+
+        The score is based on frequency, reach (unique users), and the
+        diversity of subreddits where the pain points appear.
+
+        Args:
+            pain_point_group (list): A list of pain points in a group.
+
+        Returns:
+            float: The calculated market score (0.0 to 1.0).
         """
         frequency = len(pain_point_group)
         # Placeholder for unique_users and subreddit_diversity, needs more data
@@ -73,7 +97,13 @@ class OpportunityScorer:
 
     def _detect_willingness_to_pay(self, text):
         """
-        Detects willingness to pay indicators in text.
+        Detects keywords indicating a willingness to pay in a given text.
+
+        Args:
+            text (str): The text to analyze.
+
+        Returns:
+            float: A score indicating the strength of willingness to pay.
         """
         pay_indicators = [
             r'\$\d+', r'budget', r'pay for', r'worth paying', r'subscription',
@@ -84,7 +114,10 @@ class OpportunityScorer:
 
     def generate_opportunities(self):
         """
-        Main function to generate, score, and save opportunities.
+        The main function to generate, score, and save opportunities.
+
+        It orchestrates the process of fetching pain points, grouping them,
+        scoring each group, and saving the resulting opportunities to the database.
         """
         logging.info("Generating opportunities...")
         try:

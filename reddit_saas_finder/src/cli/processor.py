@@ -9,7 +9,15 @@ console = Console()
 
 def process_pain_points(use_advanced_detector=False):
     """
-    Detects pain points from unprocessed posts and comments and saves them to the database.
+    Core logic for processing unprocessed content to find pain points.
+
+    This function fetches unprocessed posts and comments from the database,
+    runs them through a pain point detector (either basic or advanced),
+    and saves any detected pain points back to the database.
+
+    Args:
+        use_advanced_detector (bool, optional): If True, uses the advanced,
+            transformer-based model for detection. Defaults to False.
     """
     if use_advanced_detector:
         detector = AdvancedPainDetector()
@@ -78,7 +86,14 @@ def pain_points(
     advanced: bool = typer.Option(False, "--advanced", help="Use the advanced transformer-based NLP model for higher accuracy.")
 ):
     """
-    Run the pain point detection and analysis pipeline.
+    Kicks off the pain point detection and analysis pipeline on all unprocessed data.
+
+    This command finds all posts and comments that haven't been processed yet,
+    analyzes their content for potential pain points using NLP models, and stores
+    the findings in the database for further analysis.
+
+    You can choose between a faster, basic detector and a more accurate but
+    slower advanced detector using the `--advanced` flag.
     """
     console.print("[bold green]Starting NLP processing for pain points...[/bold green]")
     try:

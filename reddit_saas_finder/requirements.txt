@@ -37,4 +37,14 @@ pytest
 # pytest-cov - for measuring code coverage
 pytest-cov
 
-# python-dotenv - for managing environment variables 
+# python-dotenv - for managing environment variables
+python-dotenv
+
+# Sphinx - for generating API documentation
+Sphinx
+
+# Sphinx ReadTheDocs Theme - a theme for Sphinx
+sphinx-rtd-theme
+
+# Sphinx Autodoc Typehints - for including typehints in documentation
+sphinx-autodoc-typehints 

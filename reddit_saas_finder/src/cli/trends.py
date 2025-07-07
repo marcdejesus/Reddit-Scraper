@@ -13,7 +13,12 @@ app = typer.Typer(help="Commands for trend detection and analysis.")
 
 @app.command()
 def analyze(days: int = typer.Option(60, "--days", help="Number of days to analyze for trends.")):
-    """Analyze opportunity trends over the last N days."""
+    """
+    Analyzes and displays opportunity trends over a specified period.
+
+    This command looks at the creation dates and scores of opportunities
+    to identify if they are trending up, down, or are stable.
+    """
     console.print(f"[bold green]Analyzing opportunity trends over the last {days} days...[/bold green]")
     conn = get_db_connection()
     detector = TrendDetector(conn)
@@ -37,7 +42,12 @@ def analyze(days: int = typer.Option(60, "--days", help="Number of days to analy
 
 @app.command()
 def seasonal():
-    """Detect seasonal patterns in pain point frequency."""
+    """
+    Detects and displays seasonal patterns in pain point frequency.
+
+    This command aggregates pain points by month to identify if certain
+    problems are more prevalent during specific times of the year.
+    """
     console.print("[bold green]Detecting seasonal patterns...[/bold green]")
     conn = get_db_connection()
     detector = TrendDetector(conn)
@@ -59,7 +69,12 @@ def seasonal():
 
 @app.command()
 def predict(opportunity_id: int = typer.Option(..., "--id", help="The ID of the opportunity to predict.")):
-    """Predict growth for a specific opportunity."""
+    """
+    Predicts the future growth potential of a specific opportunity.
+
+    Using historical data, this command provides a probability score indicating
+    the likelihood that an opportunity's relevance and score will grow.
+    """
     console.print(f"[bold green]Predicting growth for opportunity ID: {opportunity_id}...[/bold green]")
     conn = get_db_connection()
     detector = TrendDetector(conn)

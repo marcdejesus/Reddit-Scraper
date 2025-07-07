@@ -13,7 +13,10 @@ def add_keyword(
     category: str = typer.Option(None, "--category", "-c", help="The category to associate with the keyword.")
 ):
     """
-    Adds a new pain point keyword.
+    Adds a new custom keyword to the pain point detection configuration.
+
+    This allows you to tailor the NLP model to recognize domain-specific terms
+    as potential pain points.
     """
     keyword_manager.add_pain_point_keyword(keyword, category)
 
@@ -22,7 +25,7 @@ def remove_keyword(
     keyword: str = typer.Argument(..., help="The keyword to remove.")
 ):
     """
-    Removes a pain point keyword.
+    Removes a custom keyword from the pain point detection configuration.
     """
     keyword_manager.remove_keyword(keyword)
 
@@ -32,14 +35,16 @@ def export_keywords(
     format: str = typer.Option("yaml", "--format", "-f", help="The format to export in (currently only yaml is supported).")
 ):
     """
-    Exports the current keywords to a file.
+    Exports all custom keywords to a YAML file.
+
+    This is useful for backing up your custom keywords or sharing them.
     """
     keyword_manager.export_keywords(output_file, format)
 
 @app.command("list")
 def list_keywords():
     """
-    Lists all configured pain point keywords.
+    Lists all currently configured custom pain point keywords.
     """
     keywords = keyword_manager.get_pain_point_keywords()
     if not keywords:

@@ -11,7 +11,12 @@ config_manager = ConfigManager()
 
 @app.command()
 def show():
-    """Displays the contents of the configuration files."""
+    """
+    Displays the contents of all loaded YAML configuration files.
+
+    This command reads the raw text of `default.yaml` and `subreddits.yaml`
+    and prints them to the console with syntax highlighting for readability.
+    """
     raw_main, raw_subreddits = config_manager.get_raw_config_text()
 
     console.print("\n[bold green]--- Main Configuration (default.yaml) ---[/bold green]")
@@ -28,7 +33,11 @@ def show():
 
 @app.command()
 def edit():
-    """Opens the main configuration file in the default editor."""
+    """
+    Opens the main `default.yaml` configuration file in the default system editor.
+
+    This provides a convenient way to quickly modify the main application settings.
+    """
     console.print(f"Opening {CONFIG_PATH} in your default editor...")
     try:
         typer.launch(CONFIG_PATH)

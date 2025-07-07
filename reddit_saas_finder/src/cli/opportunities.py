@@ -39,7 +39,10 @@ def generate(
 @app.command()
 def show():
     """
-    Show all opportunities.
+    Displays a table of all generated opportunities, sorted by score.
+
+    This command retrieves all opportunities from the database and presents them
+    in a formatted table, including their ID, Title, Category, and Total Score.
     """
     opportunities = get_opportunities()
 

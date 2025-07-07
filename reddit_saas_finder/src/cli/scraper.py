@@ -12,7 +12,16 @@ def subreddit(
     time_filter: str = typer.Option("week", "--time", "-t", help="The time filter for scraping (e.g., 'day', 'week', 'month', 'year', 'all').")
 ):
     """
-    Scrapes a specific subreddit for posts and comments and saves them to the database.
+    Scrapes posts and their comments from a specific subreddit.
+
+    This command connects to the Reddit API, fetches the top posts from the
+    specified subreddit based on the time filter, and saves them along with
+    their comments into the database for later processing.
+
+    Args:
+        subreddit (str): The name of the subreddit to scrape.
+        limit (int): The maximum number of posts to fetch.
+        time_filter (str): The time window to filter posts by (e.g., 'day', 'week').
     """
     try:
         client = RedditClient()

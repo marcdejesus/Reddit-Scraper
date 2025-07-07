@@ -9,15 +9,30 @@ warnings.filterwarnings("ignore", category=UserWarning, module="transformers")
 
 class SentimentScorer:
     """
-    Scores text for sentiment and severity.
+    Calculates sentiment and severity scores for a given text.
+
+    This class uses a pre-trained sentiment analysis model and keyword boosting
+    to evaluate the severity of a pain point.
     """
     def __init__(self):
+        """Initializes the SentimentScorer.
+
+        Loads a pre-trained sentiment analysis pipeline from the Transformers library.
+        """
         self.sentiment_analyzer = pipeline("sentiment-analysis")
 
     def score_pain_point_severity(self, text: str):
         """
         Scores the severity of a pain point based on sentiment and keywords.
-        Returns a score between 0.0 and 1.0.
+
+        The score is calculated from a base sentiment score, which is then
+        boosted by the presence of intensity and urgency keywords.
+
+        Args:
+            text (str): The text of the pain point to score.
+
+        Returns:
+            float: A severity score between 0.0 and 1.0.
         """
         sentiment = self.sentiment_analyzer(text)[0]
         base_score = sentiment['score'] if sentiment['label'] == 'NEGATIVE' else 0.1

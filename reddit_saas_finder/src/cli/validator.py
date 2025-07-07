@@ -12,7 +12,12 @@ console = Console()
 @app.command()
 def data():
     """
-    Validates the integrity and quality of the scraped data.
+    Performs a comprehensive validation of the data in the database.
+
+    This command checks for:
+    - Spam content based on a score threshold.
+    - Minimum length for posts and comments.
+    - Other quality metrics defined in the configuration.
     """
     console.print("[bold cyan]Running data validation...[/bold cyan]")
     config_manager = ConfigManager()
@@ -32,7 +37,11 @@ def data():
 @app.command()
 def report():
     """
-    Displays the data quality report.
+    Generates and displays a detailed data quality report.
+
+    This command first runs the data validation process and then
+    presents a summary report of the findings, including any
+    identified issues with data quality.
     """
     console.print("[bold cyan]Generating data quality report...[/bold cyan]")
     conn = get_db_connection()

@@ -8,15 +8,37 @@ console = Console()
 
 class DataValidator:
     """
-    Performs data quality checks on scraped Reddit data.
+    Performs data quality and integrity checks on the scraped Reddit data.
+
+    This class provides methods to validate the completeness, uniqueness,
+    and quality of the posts and comments stored in the database.
     """
     def __init__(self, db_connection):
+        """
+        Initializes the DataValidator.
+
+        Args:
+            db_connection: An active SQLite database connection.
+        """
         self.conn = db_connection
         self.report = {}
 
     def validate_data(self, spam_threshold: float = 0.5, min_post_length: int = 20, min_comment_length: int = 10, duplication_threshold: float = 0.9):
         """
-        Runs all data validation checks.
+        Runs a suite of data validation checks and stores the results.
+
+        This method checks for missing critical fields, duplicate content, and
+        low-quality or spammy entries based on configurable thresholds.
+
+        Args:
+            spam_threshold (float, optional): Threshold for spam detection. Not fully used yet.
+                Defaults to 0.5.
+            min_post_length (int, optional): The minimum character length for a post to be valid.
+                Defaults to 20.
+            min_comment_length (int, optional): The minimum character length for a comment to be valid.
+                Defaults to 10.
+            duplication_threshold (float, optional): Threshold for content duplication. Not fully used yet.
+                Defaults to 0.9.
         """
         console.print("[bold cyan]Starting data validation...[/bold cyan]")
         posts_df = pd.read_sql_query("SELECT * FROM posts", self.conn)
@@ -63,7 +85,10 @@ class DataValidator:
 
     def generate_quality_report(self):
         """
-        Generates and displays a quality report.
+        Generates and displays a detailed data quality report in the console.
+
+        This method presents the results of the last validation run in a
+        set of formatted tables, showing statistics for both posts and comments.
         """
         if not self.report:
             console.print("[yellow]No report generated. Run validation first.[/yellow]")

@@ -10,20 +10,33 @@ from data.database import get_db_connection
 
 class TrendDetector:
     """
-    Analyzes trends, seasonal patterns, and growth predictions for SaaS opportunities.
+    Analyzes time-series data to detect trends, seasonality, and predict growth.
+
+    This class queries the database for opportunity and pain point data, then
+    applies statistical methods and simple models to uncover temporal patterns.
     """
     def __init__(self, db_connection):
+        """
+        Initializes the TrendDetector.
+
+        Args:
+            db_connection: An active SQLite database connection.
+        """
         self.conn = db_connection
 
     def analyze_opportunity_trends(self, days: int = 30) -> list:
         """
-        Analyzes the trend of pain point mentions for opportunities over a specified number of days.
-        
+        Analyzes the trend of pain point mentions for opportunities over a period.
+
+        It compares the number of mentions in the first half of the period to
+        the second half to determine if the trend is increasing, decreasing, or stable.
+
         Args:
-            days: The number of days to look back for trend analysis.
-            
+            days (int): The number of days to look back for trend analysis.
+
         Returns:
-            A list of dictionaries, each containing opportunity details and its trend.
+            list: A list of dictionaries, each containing opportunity details
+                  and its calculated trend ('increasing', 'decreasing', 'stable').
         """
         end_date = datetime.utcnow()
         start_date = end_date - timedelta(days=days)
@@ -100,9 +113,12 @@ class TrendDetector:
     def detect_seasonal_patterns(self) -> dict:
         """
         Identifies seasonal patterns in pain point frequency by month.
-        
+
+        This can help identify if certain problems are more common during
+        specific times of the year.
+
         Returns:
-            A dictionary with month names as keys and pain point counts as values.
+            dict: A dictionary with month names as keys and pain point counts as values.
         """
         query = """
         SELECT
@@ -127,13 +143,18 @@ class TrendDetector:
 
     def predict_opportunity_growth(self, opportunity_id: int) -> float:
         """
-        Predicts the growth of an opportunity using linear regression.
-        
+        Predicts the growth of an opportunity using linear regression on daily mentions.
+
+        It calculates the slope of the trend line for pain point mentions related
+        to an opportunity and converts it into a growth probability score.
+
         Args:
-            opportunity_id: The ID of the opportunity to predict.
-            
+            opportunity_id (int): The ID of the opportunity to predict.
+
         Returns:
-            A float between 0 and 1 representing the probability of increase.
+            float: A float between 0 and 1 representing the probability of growth.
+                   Returns 0.0 if the opportunity is not found or has no data.
+                   Returns 0.5 if there is insufficient data for a prediction.
         """
         
         query = """

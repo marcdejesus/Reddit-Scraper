@@ -11,10 +11,19 @@ console = Console()
 
 class TerminalVisualizer:
     """
-    Handles displaying data in formatted terminal tables and charts.
+    A class to handle the display of data in formatted terminal tables and charts.
+
+    This class encapsulates the logic for creating and printing rich visual
+    representations of the analysis results, such as tables of opportunities
+    and category distributions.
     """
     def display_opportunities_table(self, limit: int = 20):
-        """Displays top opportunities in a formatted table."""
+        """
+        Fetches and displays the top N opportunities in a formatted table.
+
+        Args:
+            limit (int): The maximum number of opportunities to display.
+        """
         opportunities = get_opportunities(limit)
         if not opportunities:
             console.print("[bold yellow]No opportunities found to display.[/bold yellow]")
@@ -39,7 +48,12 @@ class TerminalVisualizer:
         console.print(table)
 
     def display_category_distribution(self):
-        """Displays the distribution of opportunities across categories."""
+        """
+        Fetches and displays the distribution of opportunities across all categories.
+
+        This method shows how many generated opportunities fall into each category,
+        presented in a simple table.
+        """
         distribution = get_category_distribution()
         if not distribution:
             console.print("[bold yellow]No category data to display.[/bold yellow]")
@@ -59,13 +73,23 @@ class TerminalVisualizer:
 def show_table(
     limit: int = typer.Option(20, "--limit", "-l", help="Limit the number of opportunities to display.")
 ):
-    """Display opportunities in a table."""
+    """
+    Displays a rich table of the top generated SaaS opportunities.
+
+    This command provides a quick overview of the highest-scoring opportunities
+    found in the database, sorted by their total score.
+    """
     visualizer = TerminalVisualizer()
     visualizer.display_opportunities_table(limit)
 
 @app.command("categories")
 def show_categories():
-    """Display category distribution chart."""
+    """
+    Displays a table showing the distribution of opportunities by category.
+
+    This helps in understanding which categories have the most identified
+    SaaS opportunities.
+    """
     visualizer = TerminalVisualizer()
     visualizer.display_category_distribution()
 
