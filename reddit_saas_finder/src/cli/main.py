@@ -4,9 +4,12 @@ from reddit_saas_finder.src.data.reddit_client import RedditClient
 from reddit_saas_finder.src.cli.processor import process_pain_points
 from reddit_saas_finder.src.cli.opportunities import generate_and_score_opportunities
 from reddit_saas_finder.src.cli.visualization import TerminalVisualizer
+from reddit_saas_finder.src.cli import config as config_cli
 from rich import print
 
 app = typer.Typer()
+app.add_typer(config_cli.app, name="config")
+
 
 @app.command()
 def init():
