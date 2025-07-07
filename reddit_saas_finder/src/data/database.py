@@ -1,1 +1,91 @@
-"""Handles all SQLite database operations.""" 
+import sqlite3
+import os
+
+# Define the path for the database relative to the project's root directory
+DB_DIR = "reddit_saas_finder/data"
+DB_PATH = os.path.join(DB_DIR, "reddit_data.db")
+
+POSTS_SCHEMA = """
+CREATE TABLE posts (
+    id TEXT PRIMARY KEY,
+    subreddit TEXT NOT NULL,
+    title TEXT NOT NULL,
+    content TEXT,
+    author TEXT,
+    score INTEGER,
+    num_comments INTEGER,
+    created_utc TIMESTAMP,
+    scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+"""
+
+COMMENTS_SCHEMA = """
+CREATE TABLE comments (
+    id TEXT PRIMARY KEY,
+    post_id TEXT REFERENCES posts(id),
+    content TEXT NOT NULL,
+    author TEXT,
+    score INTEGER,
+    created_utc TIMESTAMP,
+    scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+"""
+
+PAIN_POINTS_SCHEMA = """
+CREATE TABLE pain_points (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_id TEXT NOT NULL,
+    source_type TEXT NOT NULL, -- 'post' or 'comment'
+    content TEXT NOT NULL,
+    category TEXT,
+    severity_score REAL,
+    confidence_score REAL,
+    processed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+"""
+
+OPPORTUNITIES_SCHEMA = """
+CREATE TABLE opportunities (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    description TEXT,
+    category TEXT,
+    market_score REAL,
+    frequency_score REAL,
+    willingness_to_pay_score REAL,
+    total_score REAL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+"""
+
+def initialize_database():
+    """
+    Initializes the SQLite database and creates the necessary tables
+    if the database file does not already exist.
+    """
+    if os.path.exists(DB_PATH):
+        print(f"Database already exists at {DB_PATH}")
+        return
+
+    # Create the data directory if it doesn't exist
+    os.makedirs(DB_DIR, exist_ok=True)
+
+    print(f"Initializing database at {DB_PATH}...")
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+
+        print("Creating tables...")
+        cursor.execute(POSTS_SCHEMA)
+        cursor.execute(COMMENTS_SCHEMA)
+        cursor.execute(PAIN_POINTS_SCHEMA)
+        cursor.execute(OPPORTUNITIES_SCHEMA)
+
+        conn.commit()
+        print("Tables created successfully.")
+    except sqlite3.Error as e:
+        print(f"An error occurred: {e}")
+    finally:
+        if conn:
+            conn.close()
+            print("Database connection closed.") 

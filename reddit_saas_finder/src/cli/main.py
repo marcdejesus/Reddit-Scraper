@@ -1,4 +1,5 @@
 import typer
+from reddit_saas_finder.src.data.database import initialize_database
 
 app = typer.Typer()
 
@@ -21,6 +22,11 @@ def process():
 def opportunities():
     """Scores opportunities."""
     print("Scoring opportunities...")
+
+@app.command()
+def init_db():
+    """Initializes the database."""
+    initialize_database()
 
 if __name__ == "__main__":
     app() 
