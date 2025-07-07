@@ -39,4 +39,9 @@ scoring:
   thresholds:
     opportunity_min_score: 0.3
     high_potential_score: 0.7
-    trend_significance: 0.5 
+    trend_significance: 0.5
+
+validation:
+  spam_score_threshold: 1
+  min_post_length: 20
+  min_comment_length: 10 
