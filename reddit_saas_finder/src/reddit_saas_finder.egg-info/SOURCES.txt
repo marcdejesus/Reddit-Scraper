@@ -1,7 +1,13 @@
+MANIFEST.in
 README.md
 setup.py
+config/categories.yaml
+config/default.yaml
+config/keywords.yaml
+config/subreddits.yaml
 src/cli/__init__.py
 src/cli/config.py
+src/cli/docs.py
 src/cli/export.py
 src/cli/keywords.py
 src/cli/main.py
