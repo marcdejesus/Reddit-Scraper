@@ -1,6 +1,7 @@
 import typer
 from reddit_saas_finder.src.data.database import initialize_database
 from reddit_saas_finder.src.data.reddit_client import RedditClient
+from reddit_saas_finder.src.cli.processor import process_pain_points
 from rich import print
 
 app = typer.Typer()
@@ -30,9 +31,20 @@ def scrape(
         print(f"[bold red]An error occurred during scraping: {e}[/bold red]")
 
 @app.command()
-def process():
+def process(
+    analyze_pain_points: bool = typer.Option(False, "--analyze-pain-points", help="Run the pain point detection and analysis pipeline.")
+):
     """Processes the NLP pipeline."""
-    print("Processing NLP pipeline...")
+    if analyze_pain_points:
+        print("[bold green]Starting NLP processing for pain points...[/bold green]")
+        try:
+            process_pain_points()
+            print("[bold green]Pain point processing completed successfully.[/bold green]")
+        except Exception as e:
+            print(f"[bold red]An error occurred during NLP processing: {e}[/bold red]")
+    else:
+        print("[bold yellow]No processing task selected. Use --help for options.[/bold yellow]")
+
 
 @app.command()
 def opportunities():
