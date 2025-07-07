@@ -1,0 +1,9 @@
+[
+    {
+        "id": 1,
+        "title": "Test Opportunity",
+        "category": "productivity",
+        "total_score": 0.9,
+        "pain_point_count": 5
+    }
+]
