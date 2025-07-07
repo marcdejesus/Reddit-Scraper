@@ -239,3 +239,11 @@ def get_category_distribution() -> List[Tuple[str, int]]:
         cursor = conn.cursor()
         cursor.execute("SELECT category, COUNT(*) as count FROM opportunities GROUP BY category ORDER BY count DESC")
         return [(row['category'], row['count']) for row in cursor.fetchall()] 
+
+def get_subreddit_for_post(post_id: str) -> Optional[str]:
+    """Retrieves the subreddit for a given post ID."""
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT subreddit FROM posts WHERE id = ?", (post_id,))
+        row = cursor.fetchone()
+        return row['subreddit'] if row else None 

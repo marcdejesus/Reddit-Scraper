@@ -4,7 +4,8 @@ import re
 from rich.console import Console
 from transformers import pipeline, logging as transformers_logging
 import warnings
-from reddit_saas_finder.src.utils.keywords import KeywordManager
+from utils.keywords import KeywordManager
+from utils.performance import PerformanceOptimizer
 
 # Suppress verbose logging from transformers
 transformers_logging.set_verbosity_error()
@@ -51,6 +52,7 @@ class AdvancedPainDetector(BasicPainDetector):
     """
     def __init__(self):
         super().__init__()
+        self.optimizer = PerformanceOptimizer()
         try:
             # Using a model fine-tuned for sentiment analysis on Twitter data, which is similar to Reddit's informal text.
             self.sentiment_classifier = pipeline(
@@ -70,6 +72,10 @@ class AdvancedPainDetector(BasicPainDetector):
         if not self.sentiment_classifier:
             return super().extract_pain_points(text)
 
+        cached_result = self.optimizer.get_cached_nlp_result(text)
+        if cached_result:
+            return cached_result
+
         pain_points = []
         doc = self.nlp(text)
         
@@ -87,4 +93,6 @@ class AdvancedPainDetector(BasicPainDetector):
                         'confidence': result['score'],
                         'pattern': 'transformer-detected'
                     })
+        
+        self.optimizer.cache_nlp_result(text, pain_points)
         return pain_points 
