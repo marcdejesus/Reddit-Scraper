@@ -11,7 +11,8 @@ from cli import (
     export as export_cli,
     trends as trends_cli,
     validator as validator_cli,
-    optimizer as optimizer_cli
+    optimizer as optimizer_cli,
+    scheduler as scheduler_cli
 )
 
 app = typer.Typer(help="Reddit SaaS Opportunity Finder CLI")
@@ -26,6 +27,7 @@ app.add_typer(export_cli.app, name="export", help="Export data and generate repo
 app.add_typer(trends_cli.app, name="trends", help="Analyze trends in opportunities and pain points.")
 app.add_typer(validator_cli.app, name="validate", help="Validate data quality.")
 app.add_typer(optimizer_cli.app, name="optimize", help="Optimize performance.")
+app.add_typer(scheduler_cli.app, name="schedule", help="Schedule background tasks.")
 
 @app.command()
 def init_db():

@@ -44,4 +44,7 @@ scoring:
 validation:
   spam_score_threshold: 1
   min_post_length: 20
-  min_comment_length: 10 
+  min_comment_length: 10
+
+scheduler:
+  interval_hours: 12 
