@@ -1,0 +1,2 @@
+[console_scripts]
+reddit-finder = cli.main:app

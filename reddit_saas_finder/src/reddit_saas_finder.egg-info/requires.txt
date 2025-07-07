@@ -1,0 +1,15 @@
+typer
+praw
+spacy
+nltk
+transformers
+scikit-learn
+joblib
+pandas
+numpy
+rich
+PyYAML
+
+[dev]
+pytest
+pytest-cov

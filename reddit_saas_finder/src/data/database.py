@@ -137,24 +137,39 @@ CREATE TABLE IF NOT EXISTS opportunities (
 );
 """
 
-def get_db_connection():
+def get_db_connection(db_path: str = DB_PATH):
     """Establishes a connection to the SQLite database."""
-    os.makedirs(DB_DIR, exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
+    if db_path != ":memory:":
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
 
-def initialize_database():
+def initialize_database(connection=None):
     """Initializes the database and creates tables."""
-    console.print(f"Initializing database at [cyan]{DB_PATH}[/cyan]...")
-    with get_db_connection() as conn:
+    
+    if connection:
+        conn = connection
+        using_external_connection = True
+    else:
+        console.print(f"Initializing database at [cyan]{DB_PATH}[/cyan]...")
+        conn = get_db_connection()
+        using_external_connection = False
+
+    try:
         cursor = conn.cursor()
         cursor.execute(POSTS_SCHEMA)
         cursor.execute(COMMENTS_SCHEMA)
         cursor.execute(PAIN_POINTS_SCHEMA)
         cursor.execute(OPPORTUNITIES_SCHEMA)
         conn.commit()
-    console.print("[green]Database initialized successfully.[/green]")
+    finally:
+        if not using_external_connection:
+            conn.close()
+
+    if not using_external_connection:
+        console.print("[green]Database initialized successfully.[/green]")
+
 
 # --- Data Access Functions ---
 
