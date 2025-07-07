@@ -2,6 +2,7 @@ import typer
 from reddit_saas_finder.src.data.database import initialize_database
 from reddit_saas_finder.src.data.reddit_client import RedditClient
 from reddit_saas_finder.src.cli.processor import process_pain_points
+from reddit_saas_finder.src.cli.opportunities import generate_and_score_opportunities
 from rich import print
 
 app = typer.Typer()
@@ -47,9 +48,20 @@ def process(
 
 
 @app.command()
-def opportunities():
-    """Scores opportunities."""
-    print("Scoring opportunities...")
+def opportunities(
+    generate: bool = typer.Option(False, "--generate", help="Generate and score opportunities from the processed pain points.")
+):
+    """Generates and scores opportunities."""
+    if generate:
+        print("[bold green]Starting opportunity generation and scoring...[/bold green]")
+        try:
+            generate_and_score_opportunities()
+            print("[bold green]Opportunity generation completed successfully.[/bold green]")
+        except Exception as e:
+            print(f"[bold red]An error occurred during opportunity generation: {e}[/bold red]")
+    else:
+        print("[bold yellow]No action selected for opportunities. Use --help for options.[/bold yellow]")
+
 
 @app.command()
 def init_db():
