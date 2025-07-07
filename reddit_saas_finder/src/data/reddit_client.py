@@ -4,7 +4,7 @@ import sqlite3
 import logging
 from datetime import datetime
 
-from reddit_saas_finder.src.utils.config import load_config
+from reddit_saas_finder.src.utils.config import ConfigManager
 from reddit_saas_finder.src.data.database import DB_PATH
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -14,18 +14,19 @@ class RedditClient:
         """
         Initializes the RedditClient with API credentials from the config.
         """
-        config = load_config()
-        if not config:
-            raise ValueError("Failed to load configuration.")
-            
-        reddit_config = config.get('reddit', {})
+        config_manager = ConfigManager()
+        client_id, client_secret, user_agent = config_manager.get_reddit_credentials()
+        
+        if not all([client_id, client_secret, user_agent]):
+            raise ValueError("Missing Reddit API credentials in config.")
+
         self.reddit = praw.Reddit(
-            client_id=reddit_config.get('client_id'),
-            client_secret=reddit_config.get('client_secret'),
-            user_agent=reddit_config.get('user_agent')
+            client_id=client_id,
+            client_secret=client_secret,
+            user_agent=user_agent
         )
-        self.db_path = DB_PATH
-        self.data_collection_config = config.get('data_collection', {})
+        self.db_path = config_manager.get_database_path()
+        self.data_collection_config = config_manager.get_data_collection_config()
         logging.info("RedditClient initialized successfully.")
 
     def scrape_subreddit(self, subreddit_name: str, time_filter: str = 'week', limit: int = 100):
