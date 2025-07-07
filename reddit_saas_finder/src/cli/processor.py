@@ -1,10 +1,11 @@
 """Handles all NLP processing tasks."""
 import typer
-from rich import print
-from reddit_saas_finder.src.nlp.pain_detector import BasicPainDetector, AdvancedPainDetector
-from reddit_saas_finder.src.data.database import get_unprocessed_posts, get_unprocessed_comments, save_pain_points, PainPoint
+from rich.console import Console
+from nlp.pain_detector import BasicPainDetector, AdvancedPainDetector
+from data.database import get_unprocessed_posts, get_unprocessed_comments, save_pain_points, PainPoint
 
-app = typer.Typer()
+app = typer.Typer(help="Process scraped data to find pain points.")
+console = Console()
 
 def process_pain_points(use_advanced_detector=False):
     """
@@ -12,15 +13,15 @@ def process_pain_points(use_advanced_detector=False):
     """
     if use_advanced_detector:
         detector = AdvancedPainDetector()
-        print("[bold blue]Using advanced pain point detector.[/bold blue]")
+        console.print("[bold blue]Using advanced pain point detector.[/bold blue]")
     else:
         detector = BasicPainDetector()
-        print("[bold blue]Using basic pain point detector.[/bold blue]")
+        console.print("[bold blue]Using basic pain point detector.[/bold blue]")
 
     posts = get_unprocessed_posts()
     comments = get_unprocessed_comments()
     
-    print(f"Processing {len(posts)} new posts and {len(comments)} new comments...")
+    console.print(f"Processing {len(posts)} new posts and {len(comments)} new comments...")
     
     pain_points_to_save = []
 
@@ -41,7 +42,7 @@ def process_pain_points(use_advanced_detector=False):
                     )
                 )
         except Exception as e:
-            print(f"[bold red]Failed to process post {post.id}: {e}[/bold red]")
+            console.print(f"[bold red]Failed to process post {post.id}: {e}[/bold red]")
             # Optionally, log the full text that caused the error
             # print(f"Problematic text: {full_text}")
 
@@ -61,15 +62,15 @@ def process_pain_points(use_advanced_detector=False):
                     )
                 )
         except Exception as e:
-            print(f"[bold red]Failed to process comment {comment.id}: {e}[/bold red]")
+            console.print(f"[bold red]Failed to process comment {comment.id}: {e}[/bold red]")
             # Optionally, log the full text that caused the error
             # print(f"Problematic text: {comment.content}")
 
     if pain_points_to_save:
         save_pain_points(pain_points_to_save)
-        print(f"[bold green]Successfully detected and saved {len(pain_points_to_save)} new pain points.[/bold green]")
+        console.print(f"[bold green]Successfully detected and saved {len(pain_points_to_save)} new pain points.[/bold green]")
     else:
-        print("[bold yellow]No new pain points detected.[/bold yellow]")
+        console.print("[bold yellow]No new pain points detected.[/bold yellow]")
 
 
 @app.command()
@@ -79,12 +80,12 @@ def pain_points(
     """
     Run the pain point detection and analysis pipeline.
     """
-    print("[bold green]Starting NLP processing for pain points...[/bold green]")
+    console.print("[bold green]Starting NLP processing for pain points...[/bold green]")
     try:
         process_pain_points(use_advanced_detector=advanced)
-        print("[bold green]Pain point processing completed successfully.[/bold green]")
+        console.print("[bold green]Pain point processing completed successfully.[/bold green]")
     except Exception as e:
-        print(f"[bold red]An error occurred during NLP processing: {e}[/bold red]")
+        console.print(f"[bold red]An error occurred during NLP processing: {e}[/bold red]")
         
 if __name__ == "__main__":
     app() 

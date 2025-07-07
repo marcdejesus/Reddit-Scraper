@@ -1,8 +1,8 @@
 """Handles the CLI commands for exporting data and generating reports."""
 import typer
 from rich import print
-from reddit_saas_finder.src.utils.export import DataExporter
-from reddit_saas_finder.src.data.database import get_opportunities, get_pain_points
+from utils.export import DataExporter
+from data.database import get_opportunities, get_pain_points
 
 app = typer.Typer(help="Export data and generate reports.")
 exporter = DataExporter(export_dir="reddit_saas_finder/exports")

@@ -1,5 +1,7 @@
 """Categorizes text into predefined categories."""
-from reddit_saas_finder.src.utils.config import ConfigManager
+from utils.config import ConfigManager
+import yaml
+from rich.console import Console
 
 class Categorizer:
     """

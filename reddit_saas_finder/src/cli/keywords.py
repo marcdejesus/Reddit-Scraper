@@ -1,9 +1,9 @@
 
 import typer
 from rich.console import Console
-from reddit_saas_finder.src.utils.keywords import KeywordManager
+from utils.keywords import KeywordManager
 
-app = typer.Typer()
+app = typer.Typer(help="Manage custom keywords for NLP processing.")
 console = Console()
 keyword_manager = KeywordManager()
 

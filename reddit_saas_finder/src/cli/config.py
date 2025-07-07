@@ -2,16 +2,16 @@
 import typer
 from rich.console import Console
 from rich.syntax import Syntax
-
-from reddit_saas_finder.src.utils.config import ConfigManager, CONFIG_PATH
+import yaml
+from utils.config import ConfigManager, CONFIG_PATH
 
 app = typer.Typer(help="Manage application configuration.")
 console = Console()
+config_manager = ConfigManager()
 
 @app.command()
 def show():
     """Displays the contents of the configuration files."""
-    config_manager = ConfigManager()
     raw_main, raw_subreddits = config_manager.get_raw_config_text()
 
     console.print("\n[bold green]--- Main Configuration (default.yaml) ---[/bold green]")

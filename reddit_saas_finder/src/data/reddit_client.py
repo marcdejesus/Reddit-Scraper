@@ -4,8 +4,8 @@ from rich.console import Console
 from datetime import datetime
 from typing import List, Dict, Any
 
-from reddit_saas_finder.src.utils.config import ConfigManager
-from reddit_saas_finder.src.data.database import save_posts_and_comments
+from utils.config import ConfigManager
+from data.database import save_posts_and_comments
 
 console = Console()
 

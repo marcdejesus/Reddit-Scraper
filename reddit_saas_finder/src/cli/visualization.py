@@ -3,7 +3,8 @@ import typer
 from rich import print
 from rich.console import Console
 from rich.table import Table
-from reddit_saas_finder.src.data.database import get_opportunities, get_category_distribution
+
+from data.database import get_opportunities, get_category_distribution
 
 app = typer.Typer()
 console = Console()

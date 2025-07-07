@@ -1,7 +1,7 @@
 """Handles all Reddit data collection."""
 import typer
 from rich import print
-from reddit_saas_finder.src.data.reddit_client import RedditClient
+from data.reddit_client import RedditClient
 
 app = typer.Typer()
 

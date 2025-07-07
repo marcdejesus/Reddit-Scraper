@@ -9,7 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from rich.progress import track
 import json
 
-from reddit_saas_finder.src.data.database import get_pain_points, save_opportunities
+from data.database import get_pain_points, save_opportunities
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 

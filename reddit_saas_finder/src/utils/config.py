@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from rich.console import Console
 from rich.syntax import Syntax
 
-from reddit_saas_finder.src.data.database import DB_PATH
+from data.database import DB_PATH
 
 CONFIG_PATH = "reddit_saas_finder/config/default.yaml"
 SUBREDDITS_PATH = "reddit_saas_finder/config/subreddits.yaml"
