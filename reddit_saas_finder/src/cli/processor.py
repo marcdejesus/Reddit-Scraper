@@ -1,72 +1,76 @@
-"""Processes raw data for NLP analysis."""
-import sqlite3
-import logging
-from datetime import datetime
-from rich.progress import track
-
-from reddit_saas_finder.src.data.database import DB_PATH
+"""Handles all NLP processing tasks."""
+import typer
+from rich import print
 from reddit_saas_finder.src.nlp.pain_detector import BasicPainDetector, AdvancedPainDetector
-from reddit_saas_finder.src.nlp.categorizer import Categorizer
-from reddit_saas_finder.src.nlp.scorer import SentimentScorer
+from reddit_saas_finder.src.data.database import get_unprocessed_posts, get_unprocessed_comments, save_pain_points, PainPoint
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+app = typer.Typer()
 
-def process_pain_points(use_advanced_detector: bool = False):
+def process_pain_points(use_advanced_detector=False):
     """
-    Reads posts and comments from the database, processes them to find pain points,
-    and saves the pain points back to the database.
+    Detects pain points from unprocessed posts and comments and saves them to the database.
     """
-    logging.info(f"Starting pain point processing... (Advanced Detector: {use_advanced_detector})")
-    
     if use_advanced_detector:
-        pain_detector = AdvancedPainDetector()
+        detector = AdvancedPainDetector()
+        print("[bold blue]Using advanced pain point detector.[/bold blue]")
     else:
-        pain_detector = BasicPainDetector()
-        
-    categorizer = Categorizer()
-    scorer = SentimentScorer()
+        detector = BasicPainDetector()
+        print("[bold blue]Using basic pain point detector.[/bold blue]")
 
+    posts = get_unprocessed_posts()
+    comments = get_unprocessed_comments()
+    
+    print(f"Processing {len(posts)} new posts and {len(comments)} new comments...")
+    
+    pain_points_to_save = []
+
+    for post in posts:
+        extracted = detector.extract_pain_points(post.title + " " + (post.content or ''))
+        for pp in extracted:
+            pain_points_to_save.append(
+                PainPoint(
+                    source_id=post.id,
+                    source_type='post',
+                    content=pp['content'],
+                    # Placeholder values for scores and category
+                    severity_score=pp.get('confidence', 0.5), 
+                    confidence_score=pp.get('confidence', 0.5)
+                )
+            )
+
+    for comment in comments:
+        extracted = detector.extract_pain_points(comment.content)
+        for pp in extracted:
+            pain_points_to_save.append(
+                PainPoint(
+                    source_id=comment.id,
+                    source_type='comment',
+                    content=pp['content'],
+                    severity_score=pp.get('confidence', 0.5),
+                    confidence_score=pp.get('confidence', 0.5)
+                )
+            )
+
+    if pain_points_to_save:
+        save_pain_points(pain_points_to_save)
+        print(f"[bold green]Successfully detected and saved {len(pain_points_to_save)} new pain points.[/bold green]")
+    else:
+        print("[bold yellow]No new pain points detected.[/bold yellow]")
+
+
+@app.command()
+def pain_points(
+    advanced: bool = typer.Option(False, "--advanced", help="Use the advanced transformer-based NLP model for higher accuracy.")
+):
+    """
+    Run the pain point detection and analysis pipeline.
+    """
+    print("[bold green]Starting NLP processing for pain points...[/bold green]")
     try:
-        with sqlite3.connect(DB_PATH) as conn:
-            conn.row_factory = sqlite3.Row
-            cursor = conn.cursor()
-
-            # Fetch all posts and comments
-            cursor.execute("SELECT id, content, 'post' as type FROM posts WHERE content IS NOT NULL AND content != ''")
-            posts = cursor.fetchall()
-            cursor.execute("SELECT id, content, 'comment' as type FROM comments WHERE content IS NOT NULL AND content != ''")
-            comments = cursor.fetchall()
-            
-            all_content = posts + comments
-            logging.info(f"Processing {len(all_content)} documents.")
-
-            pain_points_to_save = []
-            for item in track(all_content, description="Analyzing content..."):
-                pain_points = pain_detector.extract_pain_points(item['content'])
-                for pp in pain_points:
-                    category = categorizer.classify_problem_category(pp['content'])
-                    severity = scorer.score_pain_point_severity(pp['content'])
-                    pain_points_to_save.append((
-                        item['id'],
-                        item['type'],
-                        pp['content'],
-                        category,
-                        severity,
-                        pp.get('confidence', 0.85), # Use confidence from advanced detector if available
-                        datetime.utcnow()
-                    ))
-            
-            logging.info(f"Found {len(pain_points_to_save)} potential pain points.")
-
-            if pain_points_to_save:
-                cursor.executemany("""
-                    INSERT INTO pain_points (source_id, source_type, content, category, severity_score, confidence_score, processed_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, pain_points_to_save)
-                conn.commit()
-                logging.info(f"Saved {len(pain_points_to_save)} pain points to the database.")
-
-    except sqlite3.Error as e:
-        logging.error(f"Database error during pain point processing: {e}")
+        process_pain_points(use_advanced_detector=advanced)
+        print("[bold green]Pain point processing completed successfully.[/bold green]")
     except Exception as e:
-        logging.error(f"An error occurred during pain point processing: {e}") 
+        print(f"[bold red]An error occurred during NLP processing: {e}[/bold red]")
+        
+if __name__ == "__main__":
+    app() 

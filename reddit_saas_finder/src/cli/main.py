@@ -1,93 +1,35 @@
 import typer
-from reddit_saas_finder.src.data.database import initialize_database
-from reddit_saas_finder.src.data.reddit_client import RedditClient
-from reddit_saas_finder.src.cli.processor import process_pain_points
-from reddit_saas_finder.src.cli.opportunities import generate_and_score_opportunities
-from reddit_saas_finder.src.cli.visualization import TerminalVisualizer
-from reddit_saas_finder.src.cli import config as config_cli
 from rich import print
+from reddit_saas_finder.src.data.database import initialize_database
+from reddit_saas_finder.src.cli import (
+    scraper, 
+    processor, 
+    opportunities, 
+    visualization, 
+    config as config_cli,
+    keywords as keywords_cli
+)
 
-app = typer.Typer()
-app.add_typer(config_cli.app, name="config")
+app = typer.Typer(help="Reddit SaaS Opportunity Finder CLI")
 
-
-@app.command()
-def init():
-    """Initializes the Reddit SaaS Finder."""
-    print("Initializing Reddit SaaS Finder...")
-
-@app.command()
-def scrape(
-    subreddit: str = typer.Option("entrepreneur", "--subreddit", "-s", help="The subreddit to scrape."),
-    limit: int = typer.Option(100, "--limit", "-l", help="The maximum number of posts to scrape."),
-    time_filter: str = typer.Option("week", "--time", "-t", help="The time filter for scraping (e.g., 'day', 'week', 'month', 'year', 'all').")
-):
-    """Scrapes Reddit data from a specified subreddit."""
-    print(f"[bold green]Starting scrape for r/{subreddit}...[/bold green]")
-    try:
-        client = RedditClient()
-        posts, comments = client.scrape_subreddit(subreddit_name=subreddit, limit=limit, time_filter=time_filter)
-        if posts or comments:
-            client.save_to_database(posts, comments)
-            print(f"[bold green]Successfully scraped and saved {len(posts)} posts and {len(comments)} comments.[/bold green]")
-        else:
-            print("[bold yellow]Scraping completed with no new data.[/bold yellow]")
-    except Exception as e:
-        print(f"[bold red]An error occurred during scraping: {e}[/bold red]")
-
-@app.command()
-def process(
-    analyze_pain_points: bool = typer.Option(False, "--analyze-pain-points", help="Run the pain point detection and analysis pipeline."),
-    advanced: bool = typer.Option(False, "--advanced", help="Use the advanced transformer-based NLP model for higher accuracy.")
-):
-    """Processes the NLP pipeline."""
-    if analyze_pain_points:
-        print("[bold green]Starting NLP processing for pain points...[/bold green]")
-        try:
-            process_pain_points(use_advanced_detector=advanced)
-            print("[bold green]Pain point processing completed successfully.[/bold green]")
-        except Exception as e:
-            print(f"[bold red]An error occurred during NLP processing: {e}[/bold red]")
-    else:
-        print("[bold yellow]No processing task selected. Use --help for options.[/bold yellow]")
-
-
-@app.command()
-def opportunities(
-    generate: bool = typer.Option(False, "--generate", help="Generate and score opportunities from the processed pain points.")
-):
-    """Generates and scores opportunities."""
-    if generate:
-        print("[bold green]Starting opportunity generation and scoring...[/bold green]")
-        try:
-            generate_and_score_opportunities()
-            print("[bold green]Opportunity generation completed successfully.[/bold green]")
-        except Exception as e:
-            print(f"[bold red]An error occurred during opportunity generation: {e}[/bold red]")
-    else:
-        print("[bold yellow]No action selected for opportunities. Use --help for options.[/bold yellow]")
-
-
-@app.command()
-def show(
-    table: bool = typer.Option(False, "--table", help="Display opportunities in a table."),
-    categories: bool = typer.Option(False, "--categories", help="Display category distribution chart."),
-    limit: int = typer.Option(20, "--limit", "-l", help="Limit the number of opportunities to display in the table.")
-):
-    """Shows different visualizations of the opportunities data."""
-    visualizer = TerminalVisualizer()
-    if table:
-        visualizer.display_opportunities_table(limit)
-    if categories:
-        visualizer.display_category_distribution()
-    if not table and not categories:
-        print("[bold yellow]Please specify a visualization to show. Use --help for options.[/bold yellow]")
-
+app.add_typer(scraper.app, name="scrape", help="Scrape data from Reddit subreddits.")
+app.add_typer(processor.app, name="process", help="Process scraped data for pain points.")
+app.add_typer(opportunities.app, name="opportunities", help="Generate and score opportunities.")
+app.add_typer(visualization.app, name="show", help="Display data in tables and charts.")
+app.add_typer(config_cli.app, name="config", help="Manage application configuration.")
+app.add_typer(keywords_cli.app, name="keywords", help="Manage custom keywords for NLP processing.")
 
 @app.command()
 def init_db():
-    """Initializes the database."""
-    initialize_database()
+    """
+    Initializes the database with the required schema.
+    """
+    print("[bold green]Initializing database...[/bold green]")
+    try:
+        initialize_database()
+        print("[bold green]Database initialized successfully.[/bold green]")
+    except Exception as e:
+        print(f"[bold red]An error occurred during database initialization: {e}[/bold red]")
 
 if __name__ == "__main__":
     app() 

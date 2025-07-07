@@ -4,6 +4,7 @@ import re
 from rich.console import Console
 from transformers import pipeline, logging as transformers_logging
 import warnings
+from reddit_saas_finder.src.utils.keywords import KeywordManager
 
 # Suppress verbose logging from transformers
 transformers_logging.set_verbosity_error()
@@ -24,14 +25,8 @@ class BasicPainDetector:
             download("en_core_web_sm")
             self.nlp = spacy.load("en_core_web_sm")
             
-        # Using the patterns from the implementation plan
-        self.pain_point_patterns = [
-            r"I hate (that|when|how)", r"(really|so) frustrating", r"why (is|does|can't|won't)",
-            r"(wish|need) there was", r"can't find (a|any) (way|tool|solution)", r"(struggling|having trouble) with",
-            r"annoying", r"terrible", r"awful", r"sucks", r"problem", r"issue",
-            r"difficulty", r"challenge", r"pain", r"waste time", r"takes forever",
-            r"slow", r"inefficient", r"tedious", r"expensive", r"costly", r"missing feature",
-        ]
+        self.keyword_manager = KeywordManager()
+        self.pain_point_patterns = self.keyword_manager.get_pain_point_keywords()
 
     def extract_pain_points(self, text: str):
         """
@@ -40,6 +35,9 @@ class BasicPainDetector:
         pain_points = []
         doc = self.nlp(text)
         
+        # Refresh patterns in case they were updated
+        self.pain_point_patterns = self.keyword_manager.get_pain_point_keywords()
+
         for sent in doc.sents:
             for pattern in self.pain_point_patterns:
                 if re.search(pattern, sent.text, re.IGNORECASE):
@@ -75,6 +73,9 @@ class AdvancedPainDetector(BasicPainDetector):
         pain_points = []
         doc = self.nlp(text)
         
+        # Refresh patterns in case they were updated
+        self.pain_point_patterns = self.keyword_manager.get_pain_point_keywords()
+
         for sent in doc.sents:
             # First, do a quick check with basic patterns to reduce the number of expensive model calls.
             if any(re.search(pattern, sent.text, re.IGNORECASE) for pattern in self.pain_point_patterns):
