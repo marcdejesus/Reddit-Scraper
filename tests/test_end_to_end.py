@@ -6,6 +6,7 @@ import csv
 from pathlib import Path
 import tempfile
 import shutil
+import sqlite3
 
 # Adjust the path to import the app from the correct location
 from cli.main import app
@@ -130,7 +131,7 @@ def test_show_command(test_db, mock_praw, mock_keyword_manager):
     result = runner.invoke(app, ["process", "pain-points"])
     runner.invoke(app, ["opportunities", "generate"])
     
-    result = runner.invoke(app, ["show", "table"])
+    result = runner.invoke(app, ["opportunities", "show"])
     assert result.exit_code == 0
     # Check for table headers in the output
     assert "Title" in result.stdout

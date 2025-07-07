@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 from typing import List, Dict, Any, Tuple, Optional
 from rich.console import Console
+import typer
 
 console = Console()
 

@@ -14,6 +14,7 @@ from cli import (
     optimizer as optimizer_cli,
     scheduler as scheduler_cli
 )
+from data.database import get_db_connection
 
 app = typer.Typer(help="Reddit SaaS Opportunity Finder CLI")
 
@@ -40,6 +41,7 @@ def init_db():
         print("[bold green]Database initialized successfully.[/bold green]")
     except Exception as e:
         print(f"[bold red]An error occurred during database initialization: {e}[/bold red]")
+        raise typer.Exit(code=1)
 
 if __name__ == "__main__":
     app() 
