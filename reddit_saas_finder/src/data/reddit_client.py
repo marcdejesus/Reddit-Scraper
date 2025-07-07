@@ -1,39 +1,39 @@
 """Manages interaction with the Reddit API via PRAW."""
 import praw
-import sqlite3
-import logging
+from rich.console import Console
 from datetime import datetime
+from typing import List, Dict, Any
 
 from reddit_saas_finder.src.utils.config import ConfigManager
-from reddit_saas_finder.src.data.database import DB_PATH
+from reddit_saas_finder.src.data.database import save_posts_and_comments
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+console = Console()
 
 class RedditClient:
+    """
+    Manages all interactions with the Reddit API using PRAW.
+    """
     def __init__(self):
-        """
-        Initializes the RedditClient with API credentials from the config.
-        """
         config_manager = ConfigManager()
         client_id, client_secret, user_agent = config_manager.get_reddit_credentials()
         
         if not all([client_id, client_secret, user_agent]):
-            raise ValueError("Missing Reddit API credentials in config.")
+            console.print("[bold red]Missing Reddit API credentials in config or environment.[/bold red]")
+            raise ValueError("Missing Reddit API credentials.")
 
         self.reddit = praw.Reddit(
             client_id=client_id,
             client_secret=client_secret,
             user_agent=user_agent
         )
-        self.db_path = config_manager.get_database_path()
         self.data_collection_config = config_manager.get_data_collection_config()
-        logging.info("RedditClient initialized successfully.")
+        console.print("RedditClient initialized successfully.", style="green")
 
-    def scrape_subreddit(self, subreddit_name: str, time_filter: str = 'week', limit: int = 100):
+    def scrape_subreddit(self, subreddit_name: str, time_filter: str = 'week', limit: int = 100) -> None:
         """
-        Scrapes posts and their top comments from a given subreddit.
+        Scrapes posts and their top comments from a given subreddit and saves them to the database.
         """
-        logging.info(f"Scraping subreddit '{subreddit_name}' with time_filter='{time_filter}' and limit={limit}.")
+        console.print(f"Scraping r/{subreddit_name} (time: {time_filter}, limit: {limit})...", style="bold blue")
         subreddit = self.reddit.subreddit(subreddit_name)
         posts_data = []
         comments_data = []
@@ -44,60 +44,39 @@ class RedditClient:
                     'id': post.id,
                     'subreddit': post.subreddit.display_name,
                     'title': post.title,
-                    'content': post.selftext,
-                    'author': post.author.name if post.author else '[deleted]',
+                    'selftext': post.selftext,
+                    'author': getattr(post.author, 'name', '[deleted]'),
                     'score': post.score,
                     'num_comments': post.num_comments,
-                    'created_utc': datetime.utcfromtimestamp(post.created_utc),
-                    'scraped_at': datetime.utcnow()
+                    'created_utc': post.created_utc,
+                    'url': post.url,
+                    'link_flair_text': post.link_flair_text,
+                    'is_self': post.is_self,
+                    'upvote_ratio': post.upvote_ratio,
                 })
 
-                # Fetch comments
-                post.comments.replace_more(limit=0) # Remove "load more comments" links
+                post.comments.replace_more(limit=0)
                 max_comments = self.data_collection_config.get('max_comments_per_post', 100)
                 for comment in post.comments.list()[:max_comments]:
                     comments_data.append({
                         'id': comment.id,
-                        'post_id': post.id,
-                        'content': comment.body,
-                        'author': comment.author.name if comment.author else '[deleted]',
+                        'post_id': comment.submission.id,
+                        'body': comment.body,
+                        'author': getattr(comment.author, 'name', '[deleted]'),
                         'score': comment.score,
-                        'created_utc': datetime.utcfromtimestamp(comment.created_utc),
-                        'scraped_at': datetime.utcnow()
+                        'created_utc': comment.created_utc,
+                        'parent_id': comment.parent_id,
+                        'depth': comment.depth,
+                        'is_submitter': comment.is_submitter,
                     })
-            logging.info(f"Scraped {len(posts_data)} posts and {len(comments_data)} comments from '{subreddit_name}'.")
-            return posts_data, comments_data
+            
+            console.print(f"Scraped {len(posts_data)} posts and {len(comments_data)} comments from r/{subreddit_name}.")
+            
+            if posts_data or comments_data:
+                save_posts_and_comments(posts_data, comments_data)
+
         except Exception as e:
-            logging.error(f"An error occurred while scraping '{subreddit_name}': {e}")
-            return [], []
+            console.print(f"An error occurred while scraping r/{subreddit_name}: {e}", style="bold red")
 
-    def save_to_database(self, posts, comments):
-        """
-        Saves scraped posts and comments to the SQLite database.
-        """
-        if not posts and not comments:
-            logging.info("No new data to save to the database.")
-            return
-
-        logging.info(f"Saving {len(posts)} posts and {len(comments)} comments to the database.")
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.cursor()
-                
-                # Use INSERT OR REPLACE to avoid duplicates and update existing entries
-                posts_to_insert = [tuple(p.values()) for p in posts]
-                cursor.executemany("""
-                    INSERT OR REPLACE INTO posts (id, subreddit, title, content, author, score, num_comments, created_utc, scraped_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, posts_to_insert)
-
-                comments_to_insert = [tuple(c.values()) for c in comments]
-                cursor.executemany("""
-                    INSERT OR REPLACE INTO comments (id, post_id, content, author, score, created_utc, scraped_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, comments_to_insert)
-                
-                conn.commit()
-                logging.info("Data saved to database successfully.")
-        except sqlite3.Error as e:
-            logging.error(f"Database error: {e}") 
+    # The save_to_database method is removed, as saving is now handled by the scrape_subreddit method directly
+    # by calling the dedicated function in database.py. This improves separation of concerns. 

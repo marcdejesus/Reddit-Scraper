@@ -12,16 +12,11 @@ def subreddit(
     time_filter: str = typer.Option("week", "--time", "-t", help="The time filter for scraping (e.g., 'day', 'week', 'month', 'year', 'all').")
 ):
     """
-    Scrapes a specific subreddit for posts and comments.
+    Scrapes a specific subreddit for posts and comments and saves them to the database.
     """
-    print(f"[bold green]Starting scrape for r/{subreddit}...[/bold green]")
     try:
         client = RedditClient()
-        posts, comments = client.scrape_subreddit(subreddit_name=subreddit, limit=limit, time_filter=time_filter)
-        if posts or comments:
-            client.save_to_database(posts, comments)
-            print(f"[bold green]Successfully scraped and saved {len(posts)} posts and {len(comments)} comments.[/bold green]")
-        else:
-            print("[bold yellow]Scraping completed with no new data.[/bold yellow]")
+        client.scrape_subreddit(subreddit_name=subreddit, limit=limit, time_filter=time_filter)
+        print(f"[bold green]Scraping task for r/{subreddit} completed.[/bold green]")
     except Exception as e:
-        print(f"[bold red]An error occurred during scraping: {e}[/bold red]")
+        print(f"[bold red]An error occurred during scraping setup: {e}[/bold red]")

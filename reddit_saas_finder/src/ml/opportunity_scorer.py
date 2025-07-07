@@ -8,7 +8,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from rich.progress import track
 
-from reddit_saas_finder.src.data.database import DB_PATH
+from reddit_saas_finder.src.data.database import get_pain_points, save_opportunities
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -17,7 +17,8 @@ class OpportunityScorer:
     Generates and scores opportunities from processed pain points.
     """
     def __init__(self):
-        self.db_path = DB_PATH
+        # The db_path is no longer needed here as we use data access functions.
+        pass
 
     def _group_similar_pain_points(self, pain_points, similarity_threshold=0.7):
         """
@@ -64,7 +65,7 @@ class OpportunityScorer:
         frequency = len(pain_point_group)
         # Placeholder for unique_users and subreddit_diversity, needs more data
         unique_users = len(set(pp['source_id'] for pp in pain_point_group))
-        subreddit_diversity = 1 # Placeholder
+        subreddit_diversity = len(set(p['subreddit'] for p in pain_point_group if p['subreddit']))
 
         market_score = (frequency * 0.4 + unique_users * 0.4 + subreddit_diversity * 0.2) / 100
         return min(1.0, market_score)
@@ -86,48 +87,48 @@ class OpportunityScorer:
         """
         logging.info("Generating opportunities...")
         try:
-            with sqlite3.connect(self.db_path) as conn:
-                conn.row_factory = sqlite3.Row
-                cursor = conn.cursor()
-                cursor.execute("SELECT * FROM pain_points")
-                pain_points = [dict(row) for row in cursor.fetchall()]
+            pain_points = get_pain_points()
 
-                if not pain_points:
-                    logging.warning("No pain points found in the database. Cannot generate opportunities.")
-                    return
+            if not pain_points:
+                logging.warning("No pain points found in the database. Cannot generate opportunities.")
+                return
 
-                pain_point_groups = self._group_similar_pain_points(pain_points)
-                logging.info(f"Identified {len(pain_point_groups)} opportunity groups.")
+            pain_point_groups = self._group_similar_pain_points(pain_points)
+            logging.info(f"Identified {len(pain_point_groups)} opportunity groups.")
 
-                opportunities_to_save = []
-                for group in track(pain_point_groups, description="Scoring opportunities..."):
-                    # For simplicity, use the longest pain point content as title/description
-                    title = max(group, key=lambda x: len(x['content']))['content'][:150]
-                    description = max(group, key=lambda x: len(x['content']))['content']
-                    category = group[0]['category']
-                    market_score = self._calculate_market_score(group)
-                    
-                    # A simple frequency score
-                    frequency_score = min(1.0, len(group) / 10.0)
-                    
-                    wtp_score = sum(self._detect_willingness_to_pay(pp['content']) for pp in group) / len(group)
+            opportunities_to_save = []
+            for group in track(pain_point_groups, description="Scoring opportunities..."):
+                # For simplicity, use the longest pain point content as title/description
+                title = max(group, key=lambda x: len(x['content']))['content'][:150]
+                description = max(group, key=lambda x: len(x['content']))['content']
+                
+                # Take category from the first item, assuming they are all the same
+                category = group[0]['category'] if group[0]['category'] else "uncategorized"
+                
+                market_score = self._calculate_market_score(group)
+                
+                # A simple frequency score
+                frequency_score = min(1.0, len(group) / 10.0)
+                
+                wtp_score = sum(self._detect_willingness_to_pay(pp['content']) for pp in group) / len(group)
 
-                    # Simple average of scores
-                    total_score = (market_score * 0.4 + frequency_score * 0.3 + wtp_score * 0.3)
+                # Simple average of scores
+                total_score = (market_score * 0.4 + frequency_score * 0.3 + wtp_score * 0.3)
 
-                    opportunities_to_save.append((
-                        title, description, category, market_score, frequency_score, wtp_score, total_score, datetime.utcnow()
-                    ))
+                opportunities_to_save.append({
+                    "title": title,
+                    "description": description,
+                    "category": category,
+                    "market_score": market_score,
+                    "frequency_score": frequency_score,
+                    "willingness_to_pay_score": wtp_score,
+                    "total_score": total_score,
+                    "pain_point_count": len(group)
+                })
 
-                if opportunities_to_save:
-                    cursor.executemany("""
-                        INSERT INTO opportunities (title, description, category, market_score, frequency_score, willingness_to_pay_score, total_score, created_at)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                    """, opportunities_to_save)
-                    conn.commit()
-                    logging.info(f"Saved {len(opportunities_to_save)} new opportunities to the database.")
+            if opportunities_to_save:
+                save_opportunities(opportunities_to_save)
+                logging.info(f"Saved {len(opportunities_to_save)} new opportunities to the database.")
 
-        except sqlite3.Error as e:
-            logging.error(f"Database error during opportunity generation: {e}")
         except Exception as e:
             logging.error(f"An error occurred during opportunity generation: {e}", exc_info=True) 

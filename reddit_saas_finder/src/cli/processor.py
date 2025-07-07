@@ -25,31 +25,45 @@ def process_pain_points(use_advanced_detector=False):
     pain_points_to_save = []
 
     for post in posts:
-        extracted = detector.extract_pain_points(post.title + " " + (post.content or ''))
-        for pp in extracted:
-            pain_points_to_save.append(
-                PainPoint(
-                    source_id=post.id,
-                    source_type='post',
-                    content=pp['content'],
-                    # Placeholder values for scores and category
-                    severity_score=pp.get('confidence', 0.5), 
-                    confidence_score=pp.get('confidence', 0.5)
+        try:
+            full_text = (post.title or "") + " " + (post.content or "")
+            if not full_text.strip():
+                continue
+            extracted = detector.extract_pain_points(full_text)
+            for pp in extracted:
+                pain_points_to_save.append(
+                    PainPoint(
+                        source_id=post.id,
+                        source_type='post',
+                        content=pp['content'],
+                        severity_score=pp.get('confidence', 0.5),
+                        confidence_score=pp.get('confidence', 0.5)
+                    )
                 )
-            )
+        except Exception as e:
+            print(f"[bold red]Failed to process post {post.id}: {e}[/bold red]")
+            # Optionally, log the full text that caused the error
+            # print(f"Problematic text: {full_text}")
 
     for comment in comments:
-        extracted = detector.extract_pain_points(comment.content)
-        for pp in extracted:
-            pain_points_to_save.append(
-                PainPoint(
-                    source_id=comment.id,
-                    source_type='comment',
-                    content=pp['content'],
-                    severity_score=pp.get('confidence', 0.5),
-                    confidence_score=pp.get('confidence', 0.5)
+        try:
+            if not comment.content or not comment.content.strip():
+                continue
+            extracted = detector.extract_pain_points(comment.content)
+            for pp in extracted:
+                pain_points_to_save.append(
+                    PainPoint(
+                        source_id=comment.id,
+                        source_type='comment',
+                        content=pp['content'],
+                        severity_score=pp.get('confidence', 0.5),
+                        confidence_score=pp.get('confidence', 0.5)
+                    )
                 )
-            )
+        except Exception as e:
+            print(f"[bold red]Failed to process comment {comment.id}: {e}[/bold red]")
+            # Optionally, log the full text that caused the error
+            # print(f"Problematic text: {comment.content}")
 
     if pain_points_to_save:
         save_pain_points(pain_points_to_save)
