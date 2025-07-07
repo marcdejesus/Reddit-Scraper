@@ -7,6 +7,7 @@ from collections import defaultdict
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from rich.progress import track
+import json
 
 from reddit_saas_finder.src.data.database import get_pain_points, save_opportunities
 
@@ -123,7 +124,8 @@ class OpportunityScorer:
                     "frequency_score": frequency_score,
                     "willingness_to_pay_score": wtp_score,
                     "total_score": total_score,
-                    "pain_point_count": len(group)
+                    "pain_point_count": len(group),
+                    "pain_point_ids": json.dumps([pp['id'] for pp in group])
                 })
 
             if opportunities_to_save:

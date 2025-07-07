@@ -1,14 +1,15 @@
 import typer
 from rich import print
-from reddit_saas_finder.src.data.database import initialize_database
-from reddit_saas_finder.src.cli import (
+from data.database import initialize_database
+from cli import (
     scraper, 
     processor, 
     opportunities, 
     visualization, 
     config as config_cli,
     keywords as keywords_cli,
-    export as export_cli
+    export as export_cli,
+    trends as trends_cli
 )
 
 app = typer.Typer(help="Reddit SaaS Opportunity Finder CLI")
@@ -20,6 +21,7 @@ app.add_typer(visualization.app, name="show", help="Display data in tables and c
 app.add_typer(config_cli.app, name="config", help="Manage application configuration.")
 app.add_typer(keywords_cli.app, name="keywords", help="Manage custom keywords for NLP processing.")
 app.add_typer(export_cli.app, name="export", help="Export data and generate reports.")
+app.add_typer(trends_cli.app, name="trends", help="Analyze trends in opportunities and pain points.")
 
 @app.command()
 def init_db():

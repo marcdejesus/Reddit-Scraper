@@ -65,6 +65,7 @@ class Opportunity:
         self.total_score = total_score
         self.pain_point_count = pain_point_count
         self.market_score: float = kwargs.get('market_score', 0.0)
+        self.pain_point_ids: str = kwargs.get('pain_point_ids', '[]')
 
 
 # --- Schema Definitions ---
@@ -131,6 +132,7 @@ CREATE TABLE IF NOT EXISTS opportunities (
     willingness_to_pay_score REAL,
     total_score REAL,
     pain_point_count INTEGER,
+    pain_point_ids TEXT, -- JSON array of pain point IDs
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 """
@@ -218,10 +220,10 @@ def get_pain_points() -> List[Dict[str, Any]]:
 
 def save_opportunities(opportunities: List[Dict[str, Any]]):
     """Saves a list of opportunity dictionaries to the database."""
-    opp_data = [(o['title'], o['description'], o['category'], o.get('market_score', 0), o['frequency_score'], o['willingness_to_pay_score'], o['total_score'], o['pain_point_count']) for o in opportunities]
+    opp_data = [(o['title'], o['description'], o['category'], o.get('market_score', 0), o['frequency_score'], o['willingness_to_pay_score'], o['total_score'], o['pain_point_count'], o.get('pain_point_ids', '[]')) for o in opportunities]
     with get_db_connection() as conn:
         cursor = conn.cursor()
-        cursor.executemany("INSERT INTO opportunities (title, description, category, market_score, frequency_score, willingness_to_pay_score, total_score, pain_point_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", opp_data)
+        cursor.executemany("INSERT INTO opportunities (title, description, category, market_score, frequency_score, willingness_to_pay_score, total_score, pain_point_count, pain_point_ids) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", opp_data)
         conn.commit()
 
 def get_opportunities(limit: int = 20) -> List[Opportunity]:
