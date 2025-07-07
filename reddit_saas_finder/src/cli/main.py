@@ -3,7 +3,7 @@ from reddit_saas_finder.src.data.database import initialize_database
 from reddit_saas_finder.src.data.reddit_client import RedditClient
 from reddit_saas_finder.src.cli.processor import process_pain_points
 from reddit_saas_finder.src.cli.opportunities import generate_and_score_opportunities
-from reddit_saas_finder.src.cli.visualization import display_opportunities_table, display_category_distribution
+from reddit_saas_finder.src.cli.visualization import TerminalVisualizer
 from rich import print
 
 app = typer.Typer()
@@ -72,10 +72,11 @@ def show(
     limit: int = typer.Option(20, "--limit", "-l", help="Limit the number of opportunities to display in the table.")
 ):
     """Shows different visualizations of the opportunities data."""
+    visualizer = TerminalVisualizer()
     if table:
-        display_opportunities_table(limit)
+        visualizer.display_opportunities_table(limit)
     if categories:
-        display_category_distribution()
+        visualizer.display_category_distribution()
     if not table and not categories:
         print("[bold yellow]Please specify a visualization to show. Use --help for options.[/bold yellow]")
 
