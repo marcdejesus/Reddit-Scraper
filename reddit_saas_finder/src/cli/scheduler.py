@@ -3,7 +3,7 @@ import typer
 from rich.console import Console
 
 from utils.scheduler import TaskScheduler
-from utils.config import load_config
+from utils.config import ConfigManager
 
 app = typer.Typer(help="Commands for scheduling scraping and processing tasks.")
 console = Console()
@@ -15,7 +15,8 @@ def start(
     """
     Starts the background scheduler.
     """
-    config = load_config()
+    config_manager = ConfigManager()
+    config = config_manager.config
     scheduler_config = config.get('scheduler', {})
     
     interval_hours = interval if interval is not None else scheduler_config.get('interval_hours', 12)

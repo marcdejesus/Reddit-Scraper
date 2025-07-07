@@ -14,7 +14,7 @@ class DataValidator:
         self.conn = db_connection
         self.report = {}
 
-    def validate_data(self, spam_threshold: float = 0.5, duplication_threshold: float = 0.9):
+    def validate_data(self, spam_threshold: float = 0.5, min_post_length: int = 20, min_comment_length: int = 10, duplication_threshold: float = 0.9):
         """
         Runs all data validation checks.
         """
@@ -38,8 +38,8 @@ class DataValidator:
 
         # Spam/Low-quality check (example: very short content or low score)
         # This can be made more sophisticated.
-        spam_posts = posts_df[(posts_df['content'].str.len() < 20) | (posts_df['score'] < 1)].shape[0]
-        spam_comments = comments_df[(comments_df['content'].str.len() < 10) | (comments_df['score'] < 1)].shape[0]
+        spam_posts = posts_df[(posts_df['content'].str.len() < min_post_length) | (posts_df['score'] < 1)].shape[0]
+        spam_comments = comments_df[(comments_df['content'].str.len() < min_comment_length) | (comments_df['score'] < 1)].shape[0]
 
 
         self.report = {
