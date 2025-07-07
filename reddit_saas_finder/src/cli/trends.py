@@ -1,0 +1,1 @@
+"""Handles trend detection and analysis.""" 

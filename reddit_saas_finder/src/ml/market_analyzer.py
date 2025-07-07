@@ -1,0 +1,1 @@
+"""Analyzes market size and potential.""" 

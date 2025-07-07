@@ -1,0 +1,1 @@
+"""Manages configuration for the application.""" 

@@ -1,0 +1,1 @@
+"""Detects trends using machine learning.""" 

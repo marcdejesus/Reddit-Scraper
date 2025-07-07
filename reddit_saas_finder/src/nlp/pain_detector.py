@@ -1,0 +1,1 @@
+"""Detects pain points in text.""" 

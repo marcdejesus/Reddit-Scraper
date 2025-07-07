@@ -1,0 +1,1 @@
+"""Manages the generation and scoring of opportunities.""" 
