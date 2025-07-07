@@ -1,13 +1,38 @@
-typer
+# PRAW - Python Reddit API Wrapper for accessing Reddit data
 praw
+
+# Typer - for creating the Command-Line Interface
+typer
+
+# spaCy - for advanced NLP and text processing
 spacy
+
+# NLTK - for natural language processing tasks
 nltk
+
+# Transformers - for using state-of-the-art machine learning models from Hugging Face
 transformers
+
+# scikit-learn - for machine learning algorithms and tools
 scikit-learn
+
+# joblib - for saving and loading machine learning models
 joblib
+
+# pandas - for data manipulation and analysis
 pandas
+
+# numpy - for numerical operations
 numpy
+
+# Rich - for beautiful formatting in the terminal
 rich
+
+# PyYAML - for managing configuration files
 PyYAML
+
+# pytest - for testing the application
 pytest
+
+# pytest-cov - for measuring code coverage
 pytest-cov 
