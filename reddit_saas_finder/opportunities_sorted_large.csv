@@ -1,0 +1,33 @@
+id,title,description,category,total_score,pain_point_count,market_score,pain_point_ids
+365,What specific aspects are you finding most difficult to navigate?,What specific aspects are you finding most difficult to navigate?,other,0.348,20,0.12,"[237, 250, 274, 279, 280, 285, 286, 287, 288, 329, 418, 431, 455, 460, 461, 466, 467, 468, 469, 510]"
+370,What specific aspects are you finding most difficult to navigate?,What specific aspects are you finding most difficult to navigate?,other,0.348,20,0.12,"[237, 250, 274, 279, 280, 285, 286, 287, 288, 329, 418, 431, 455, 460, 461, 466, 467, 468, 469, 510]"
+374,What specific aspects are you finding most difficult to navigate?,What specific aspects are you finding most difficult to navigate?,other,0.348,20,0.12,"[237, 250, 274, 279, 280, 285, 286, 287, 288, 329, 418, 431, 455, 460, 461, 466, 467, 468, 469, 510]"
+375,I think u understand that it is impossible (or almost impossible),I think u understand that it is impossible (or almost impossible),other,0.1944,6,0.036000000000000004,"[248, 275, 356, 429, 456, 537]"
+363,What’s difficult is everything around it.,What’s difficult is everything around it.,other,0.1296,4,0.024000000000000004,"[208, 220, 389, 401]"
+364,"I came up with this idea because I wanted to start using Notion myself, but I realized it was very difficult to create my own template to my liking, s","I came up with this idea because I wanted to start using Notion myself, but I realized it was very difficult to create my own template to my liking, so I thought about creating an AI tool that would do it automatically.",other,0.1296,4,0.024000000000000004,"[227, 294, 408, 475]"
+366,Impossible.,Impossible.,other,0.1296,4,0.024000000000000004,"[248, 275, 429, 456]"
+368,"In my experience, SEO has become increasingly difficult to break into for us, as we are up against mature competitors who already dominate both organi","In my experience, SEO has become increasingly difficult to break into for us, as we are up against mature competitors who already dominate both organic and paid placements.",marketing,0.1296,4,0.024000000000000004,"[283, 284, 464, 465]"
+371,What’s difficult is everything around it.,What’s difficult is everything around it.,other,0.1296,4,0.024000000000000004,"[208, 220, 389, 401]"
+372,"Some sites were easy to scrape, some hard, few almost impossible.","Some sites were easy to scrape, some hard, few almost impossible.",other,0.1296,4,0.024000000000000004,"[214, 263, 395, 444]"
+373,"I came up with this idea because I wanted to start using Notion myself, but I realized it was very difficult to create my own template to my liking, s","I came up with this idea because I wanted to start using Notion myself, but I realized it was very difficult to create my own template to my liking, so I thought about creating an AI tool that would do it automatically.",other,0.1296,4,0.024000000000000004,"[227, 294, 408, 475]"
+377,"In my experience, SEO has become increasingly difficult to break into for us, as we are up against mature competitors who already dominate both organi","In my experience, SEO has become increasingly difficult to break into for us, as we are up against mature competitors who already dominate both organic and paid placements.",marketing,0.1296,4,0.024000000000000004,"[283, 284, 464, 465]"
+367,"Going from $0 to $1M ARR: impossible 
+
+Going from $1m to $10m ARR: improbable 
+
+Going from $10m to $100m ARR: inevitable","Going from $0 to $1M ARR: impossible 
+
+Going from $1m to $10m ARR: improbable 
+
+Going from $10m to $100m ARR: inevitable",other,0.1248,2,0.012000000000000002,"[257, 438]"
+369,"Would it be a limited version of the software to do this, cause it's difficult to transition non-paying to paying, and even more so in a company due t","Would it be a limited version of the software to do this, cause it's difficult to transition non-paying to paying, and even more so in a company due to software procurement and budgeting processes.",automation,0.1248,2,0.012000000000000002,"[327, 508]"
+376,"Going from $0 to $1M ARR: impossible 
+
+Going from $1m to $10m ARR: improbable 
+
+Going from $10m to $100m ARR: inevitable","Going from $0 to $1M ARR: impossible 
+
+Going from $1m to $10m ARR: improbable 
+
+Going from $10m to $100m ARR: inevitable",other,0.1248,2,0.012000000000000002,"[257, 438]"
+378,"Would it be a limited version of the software to do this, cause it's difficult to transition non-paying to paying, and even more so in a company due t","Would it be a limited version of the software to do this, cause it's difficult to transition non-paying to paying, and even more so in a company due to software procurement and budgeting processes.",automation,0.1248,2,0.012000000000000002,"[327, 508]"

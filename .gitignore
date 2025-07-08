@@ -5,3 +5,13 @@
 
 # Cache files
 reddit_saas_finder/cache/
+
+# Cache and artifacts
+/reddit_saas_finder/cache/
+/reddit_saas_finder/reddit_saas_finder/cache/
+*.pyc
+.DS_Store
+
+# Virtual environment
+/venv/
+.env.local

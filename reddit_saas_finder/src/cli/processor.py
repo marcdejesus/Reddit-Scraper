@@ -1,9 +1,9 @@
 """Handles all NLP processing tasks."""
 import typer
 from rich.console import Console
-from src.nlp.pain_detector import BasicPainDetector, AdvancedPainDetector
-from src.nlp.categorizer import Categorizer
-from src.data.database import get_unprocessed_posts, get_unprocessed_comments, save_pain_points, PainPoint
+from nlp.pain_detector import BasicPainDetector, AdvancedPainDetector
+from nlp.categorizer import Categorizer
+from data.database import get_unprocessed_posts, get_unprocessed_comments, save_pain_points, PainPoint
 from typing_extensions import Annotated
 
 console = Console()

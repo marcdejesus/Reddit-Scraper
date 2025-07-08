@@ -3,11 +3,14 @@ import praw
 from rich.console import Console
 from datetime import datetime
 from typing import List, Dict, Any
+import logging
 
-from src.utils.config import ConfigManager
-from src.data.database import save_posts_and_comments
+from utils.config import ConfigManager
+from data.database import save_posts_and_comments
 
 console = Console()
+logging.basicConfig(filename='reddit_client.log', level=logging.ERROR, 
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 class RedditClient:
     """
@@ -95,6 +98,7 @@ class RedditClient:
 
         except Exception as e:
             console.print(f"An error occurred while scraping r/{subreddit_name}: {e}", style="bold red")
+            logging.error(f"Error scraping r/{subreddit_name}: {e}", exc_info=True)
 
     # The save_to_database method is removed, as saving is now handled by the scrape_subreddit method directly
     # by calling the dedicated function in database.py. This improves separation of concerns. 

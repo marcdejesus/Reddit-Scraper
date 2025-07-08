@@ -3,15 +3,19 @@ import sqlite3
 import logging
 import re
 from datetime import datetime
-from collections import defaultdict
+from collections import defaultdict, Counter
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from rich.progress import track
 import json
+import spacy
 
-from src.data.database import get_pain_points, save_opportunities
+from data.database import get_pain_points, save_opportunities
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, 
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    filename='opportunity_scorer.log',
+                    filemode='w')
 
 class OpportunityScorer:
     """
@@ -21,13 +25,21 @@ class OpportunityScorer:
     (market, frequency, willingness to pay), and generates a final
     opportunity score.
     """
-    def __init__(self, pain_points, min_pain_points=5, min_score=0.5):
+    def __init__(self, pain_points, min_pain_points=5, min_score=0.5, similarity_threshold=0.7):
         """Initializes the OpportunityScorer."""
         self.pain_points = pain_points
         self.min_pain_points = min_pain_points
         self.min_score = min_score
+        self.similarity_threshold = similarity_threshold
+        try:
+            self.nlp = spacy.load("en_core_web_sm")
+        except OSError:
+            logging.warning("spaCy model 'en_core_web_sm' not found. Downloading...")
+            from spacy.cli import download
+            download("en_core_web_sm")
+            self.nlp = spacy.load("en_core_web_sm")
 
-    def _group_similar_pain_points(self, similarity_threshold=0.7):
+    def _group_similar_pain_points(self):
         """
         Groups similar pain points using TF-IDF and cosine similarity.
 
@@ -67,13 +79,64 @@ class OpportunityScorer:
             
             # Find similar pain points
             for j in range(i + 1, len(self.pain_points)):
-                if not visited[j] and similarity_matrix[i, j] >= similarity_threshold:
+                if not visited[j] and similarity_matrix[i, j] >= self.similarity_threshold:
                     current_group.append(self.pain_points[j])
                     visited[j] = True
             
             groups.append(current_group)
             
         return groups
+
+    def _generate_saas_idea_title(self, pain_point_group):
+        """Generates a descriptive SaaS idea title from a group of pain points."""
+        if not self.nlp:
+            # Fallback for when spacy model is not loaded
+            group_content = " ".join([pp['content'] for pp in pain_point_group])
+            vectorizer = TfidfVectorizer(stop_words='english', max_features=5)
+            vectorizer.fit([group_content])
+            title_keywords = vectorizer.get_feature_names_out()
+            return " ".join(title_keywords).title()
+
+        full_text = " ".join([pp['content'] for pp in pain_point_group]).lower()
+        doc = self.nlp(full_text)
+
+        # Find common nouns
+        nouns = [token.lemma_ for token in doc if token.pos_ == 'NOUN' and not token.is_stop and len(token.lemma_) > 2]
+        common_nouns = [noun for noun, count in Counter(nouns).most_common(2)]
+
+        # Find common verbs
+        verbs = [token.lemma_ for token in doc if token.pos_ == 'VERB' and not token.is_stop]
+        common_verbs = [verb for verb, count in Counter(verbs).most_common(1)]
+        
+        # Determine target audience
+        subreddits = [pp.get('subreddit') for pp in pain_point_group if pp.get('subreddit')]
+        audience = "Professionals" # default
+        if subreddits:
+            most_common_subreddit = Counter(subreddits).most_common(1)[0][0]
+            audience_map = {
+                'freelance': 'Freelancers',
+                'smallbusiness': 'Small Businesses',
+                'startups': 'Startups',
+                'entrepreneur': 'Entrepreneurs',
+                'marketing': 'Marketers',
+                'webdev': 'Web Developers',
+                'saas': 'SaaS Founders'
+            }
+            audience = audience_map.get(most_common_subreddit.lower(), f"{most_common_subreddit.title()}")
+
+        if not common_nouns:
+            return "Automated Workflow & Task Management"
+
+        noun1 = common_nouns[0].title()
+        
+        if len(common_nouns) > 1:
+            noun2 = common_nouns[1].title()
+            return f"AI-Powered {noun1} & {noun2} Platform for {audience}"
+        elif common_verbs:
+            verb1 = common_verbs[0].title()
+            return f"Simplified Tool for {verb1}ing {noun1} for {audience}"
+        else:
+            return f"Automated {noun1} Solution for {audience}"
 
     def _calculate_market_score(self, pain_point_group):
         """
@@ -93,7 +156,7 @@ class OpportunityScorer:
         unique_users = len(set(pp['source_id'] for pp in pain_point_group))
         subreddit_diversity = len(set(p['subreddit'] for p in pain_point_group if p['subreddit']))
 
-        market_score = (frequency * 0.4 + unique_users * 0.4 + subreddit_diversity * 0.2) / 100
+        market_score = (frequency * 0.4 + unique_users * 0.4 + subreddit_diversity * 0.2)
         return min(1.0, market_score)
 
     def _detect_willingness_to_pay(self, text):
@@ -134,8 +197,7 @@ class OpportunityScorer:
                 if len(group) < self.min_pain_points:
                     continue
 
-                # For simplicity, use the longest pain point content as title/description
-                title = max(group, key=lambda x: len(x['content']))['content'][:150]
+                title = self._generate_saas_idea_title(group)
                 description = max(group, key=lambda x: len(x['content']))['content']
                 
                 # Take the most common category from the group

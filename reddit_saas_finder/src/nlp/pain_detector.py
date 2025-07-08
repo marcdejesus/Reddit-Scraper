@@ -4,8 +4,8 @@ import re
 from rich.console import Console
 from transformers import pipeline, logging as transformers_logging
 import warnings
-from src.utils.keywords import KeywordManager
-from src.utils.performance import PerformanceOptimizer
+from utils.keywords import KeywordManager
+from utils.performance import PerformanceOptimizer
 
 # Suppress verbose logging from transformers
 transformers_logging.set_verbosity_error()

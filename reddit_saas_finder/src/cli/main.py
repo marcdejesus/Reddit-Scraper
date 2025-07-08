@@ -1,11 +1,13 @@
 import typer
 from rich.console import Console
-from src.data.database import initialize_database, get_db_connection
-from src.cli.scraper import scrape
-from src.cli.processor import process
-from src.cli.opportunities import opportunities_app
-from src.cli.export import export, report
-from src.cli import docs as docs_cli
+from data.database import initialize_database, get_db_connection
+from cli.scraper import app as scraper_app
+from cli.processor import process
+from cli.opportunities import opportunities_app
+from cli.export import export, report
+from cli import docs as docs_cli
+from cli import config as config_cli
+from cli import trends as trends_cli
 
 # Main Typer app
 app = typer.Typer(
@@ -15,12 +17,14 @@ app = typer.Typer(
 console = Console()
 
 # Add subcommands from other modules
-app.command()(scrape)
+app.add_typer(scraper_app, name="scrape")
 app.command()(process)
 app.command()(export)
 app.command()(report)
 app.add_typer(opportunities_app, name="opportunities")
 app.add_typer(docs_cli.app, name="docs")
+app.add_typer(config_cli.app, name="config")
+app.add_typer(trends_cli.app, name="trends")
 
 
 @app.callback()

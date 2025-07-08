@@ -20,6 +20,7 @@ src/config/categories.yaml
 src/config/default.yaml
 src/config/keywords.yaml
 src/config/subreddits.yaml
+src/config/__pycache__/__init__.cpython-313.pyc
 src/data/__init__.py
 src/data/cache.py
 src/data/database.py

@@ -1,8 +1,8 @@
 """Handles opportunity generation and scoring."""
 import typer
 from rich.console import Console
-from src.ml.opportunity_scorer import OpportunityScorer
-from src.data.database import get_pain_points, save_opportunities, Opportunity as OpportunityDB, get_opportunities
+from ml.opportunity_scorer import OpportunityScorer
+from data.database import get_pain_points, save_opportunities, Opportunity as OpportunityDB, get_opportunities
 from rich.table import Table
 
 opportunities_app = typer.Typer()
@@ -11,7 +11,8 @@ console = Console()
 @opportunities_app.command()
 def generate(
     min_pain_points: int = typer.Option(5, "--min-points", help="Minimum number of related pain points to be considered an opportunity."),
-    min_score: float = typer.Option(0.5, "--min-score", help="Minimum sentiment score for a pain point to be included.")
+    min_score: float = typer.Option(0.5, "--min-score", help="Minimum sentiment score for a pain point to be included."),
+    similarity: float = typer.Option(0.7, "--similarity", help="Similarity threshold for grouping pain points (0.0 to 1.0).")
 ):
     """
     Analyzes detected pain points to generate and score potential SaaS opportunities.
@@ -23,7 +24,7 @@ def generate(
             console.print("[yellow]No pain points found to analyze. Run the 'process' command first.[/yellow]")
             return
 
-        scorer = OpportunityScorer(pain_points, min_pain_points, min_score)
+        scorer = OpportunityScorer(pain_points, min_pain_points, min_score, similarity)
         opportunities = scorer.generate_opportunities()
         
         if not opportunities:
@@ -61,6 +62,34 @@ def show():
         )
 
     console.print(table)
+
+
+@opportunities_app.command()
+def recommend():
+    """
+    Shows a table of the top 5 recommended opportunities.
+    """
+    opportunities = get_opportunities(limit=5)
+
+    table = Table(title="Top 5 Recommended Opportunities")
+    table.add_column("ID", style="dim", width=6)
+    table.add_column("Recommended Opportunity", style="green")
+    table.add_column("Category", style="cyan")
+    table.add_column("Score", style="magenta", justify="right")
+    table.add_column("Recommendation", style="yellow")
+
+    for opp in opportunities:
+        recommendation = "Best Bet" if opp.total_score > 0.3 else "Promising"
+        table.add_row(
+            str(opp.id),
+            opp.title,
+            opp.category,
+            f"{opp.total_score:.2f}",
+            recommendation
+        )
+
+    console.print(table)
+
 
 if __name__ == "__main__":
     opportunities_app() 

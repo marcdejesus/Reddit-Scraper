@@ -7,7 +7,7 @@ from datetime import datetime
 from rich.console import Console
 from typing import List, Dict, Any
 
-from src.data.database import (
+from data.database import (
     get_opportunities, 
     get_pain_points, 
     get_category_distribution,
