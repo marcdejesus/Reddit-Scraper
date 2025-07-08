@@ -5,7 +5,7 @@ from rich.console import Console
 from rich.syntax import Syntax
 import importlib.resources
 
-from data.database import DB_PATH
+from src.data.database import DB_PATH
 
 console = Console()
 
@@ -25,7 +25,7 @@ class ConfigManager:
         Loads a single YAML configuration file from the package data.
         """
         try:
-            with importlib.resources.files('config').joinpath(filename).open('r') as f:
+            with importlib.resources.files('src.config').joinpath(filename).open('r') as f:
                 raw_config = f.read()
                 expanded_config = os.path.expandvars(raw_config)
                 return yaml.safe_load(expanded_config)
@@ -109,13 +109,13 @@ class ConfigManager:
         raw_main = ""
         raw_subreddits = ""
         try:
-            with importlib.resources.files('config').joinpath('default.yaml').open('r') as f:
+            with importlib.resources.files('src.config').joinpath('default.yaml').open('r') as f:
                 raw_main = f.read()
         except FileNotFoundError:
             pass 
 
         try:
-            with importlib.resources.files('config').joinpath('subreddits.yaml').open('r') as f:
+            with importlib.resources.files('src.config').joinpath('subreddits.yaml').open('r') as f:
                 raw_subreddits = f.read()
         except FileNotFoundError:
             pass

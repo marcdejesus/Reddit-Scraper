@@ -9,7 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from rich.progress import track
 import json
 
-from data.database import get_pain_points, save_opportunities
+from src.data.database import get_pain_points, save_opportunities
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -21,12 +21,13 @@ class OpportunityScorer:
     (market, frequency, willingness to pay), and generates a final
     opportunity score.
     """
-    def __init__(self):
+    def __init__(self, pain_points, min_pain_points=5, min_score=0.5):
         """Initializes the OpportunityScorer."""
-        # The db_path is no longer needed here as we use data access functions.
-        pass
+        self.pain_points = pain_points
+        self.min_pain_points = min_pain_points
+        self.min_score = min_score
 
-    def _group_similar_pain_points(self, pain_points, similarity_threshold=0.7):
+    def _group_similar_pain_points(self, similarity_threshold=0.7):
         """
         Groups similar pain points using TF-IDF and cosine similarity.
 
@@ -40,11 +41,11 @@ class OpportunityScorer:
         Returns:
             list: A list of groups, where each group is a list of pain points.
         """
-        if not pain_points:
+        if not self.pain_points:
             return []
 
         # Extract content for vectorization
-        contents = [pp['content'] for pp in pain_points]
+        contents = [pp['content'] for pp in self.pain_points]
         
         # Vectorize the text using TF-IDF
         vectorizer = TfidfVectorizer(stop_words='english')
@@ -54,20 +55,20 @@ class OpportunityScorer:
         similarity_matrix = cosine_similarity(tfidf_matrix)
         
         groups = []
-        visited = [False] * len(pain_points)
+        visited = [False] * len(self.pain_points)
         
-        for i in range(len(pain_points)):
+        for i in range(len(self.pain_points)):
             if visited[i]:
                 continue
             
             # Start a new group with the current pain point
-            current_group = [pain_points[i]]
+            current_group = [self.pain_points[i]]
             visited[i] = True
             
             # Find similar pain points
-            for j in range(i + 1, len(pain_points)):
+            for j in range(i + 1, len(self.pain_points)):
                 if not visited[j] and similarity_matrix[i, j] >= similarity_threshold:
-                    current_group.append(pain_points[j])
+                    current_group.append(self.pain_points[j])
                     visited[j] = True
             
             groups.append(current_group)
@@ -121,23 +122,28 @@ class OpportunityScorer:
         """
         logging.info("Generating opportunities...")
         try:
-            pain_points = get_pain_points()
-
-            if not pain_points:
+            if not self.pain_points:
                 logging.warning("No pain points found in the database. Cannot generate opportunities.")
                 return
 
-            pain_point_groups = self._group_similar_pain_points(pain_points)
+            pain_point_groups = self._group_similar_pain_points()
             logging.info(f"Identified {len(pain_point_groups)} opportunity groups.")
 
             opportunities_to_save = []
             for group in track(pain_point_groups, description="Scoring opportunities..."):
+                if len(group) < self.min_pain_points:
+                    continue
+
                 # For simplicity, use the longest pain point content as title/description
                 title = max(group, key=lambda x: len(x['content']))['content'][:150]
                 description = max(group, key=lambda x: len(x['content']))['content']
                 
-                # Take category from the first item, assuming they are all the same
-                category = group[0]['category'] if group[0]['category'] else "uncategorized"
+                # Take the most common category from the group
+                categories = [pp['category'] for pp in group if pp['category']]
+                if categories:
+                    category = max(set(categories), key=categories.count)
+                else:
+                    category = "uncategorized"
                 
                 market_score = self._calculate_market_score(group)
                 
@@ -148,6 +154,9 @@ class OpportunityScorer:
 
                 # Simple average of scores
                 total_score = (market_score * 0.4 + frequency_score * 0.3 + wtp_score * 0.3)
+
+                if total_score < self.min_score:
+                    continue
 
                 opportunities_to_save.append({
                     "title": title,
@@ -161,9 +170,8 @@ class OpportunityScorer:
                     "pain_point_ids": json.dumps([pp['id'] for pp in group])
                 })
 
-            if opportunities_to_save:
-                save_opportunities(opportunities_to_save)
-                logging.info(f"Saved {len(opportunities_to_save)} new opportunities to the database.")
+            return opportunities_to_save
 
         except Exception as e:
-            logging.error(f"An error occurred during opportunity generation: {e}", exc_info=True) 
+            logging.error(f"An error occurred during opportunity generation: {e}", exc_info=True)
+            return [] 

@@ -1,5 +1,5 @@
 """Categorizes text into predefined categories."""
-from utils.config import ConfigManager
+from src.utils.config import ConfigManager
 import yaml
 from rich.console import Console
 

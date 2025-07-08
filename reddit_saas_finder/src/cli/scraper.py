@@ -1,7 +1,7 @@
 """Handles all Reddit data collection."""
 import typer
 from rich import print
-from data.reddit_client import RedditClient
+from src.data.reddit_client import RedditClient
 from typing_extensions import Annotated
 
 # This file will now export the command function directly, 

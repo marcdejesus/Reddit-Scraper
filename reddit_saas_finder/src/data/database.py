@@ -8,7 +8,12 @@ import typer
 console = Console()
 
 # --- Database Setup ---
-DB_DIR = "reddit_saas_finder/data"
+# Correctly locate the project root to build the DB path
+# This assumes database.py is in src/data/
+DB_FILE_PATH = os.path.abspath(__file__)
+SRC_DIR = os.path.dirname(os.path.dirname(DB_FILE_PATH))
+PROJECT_ROOT = os.path.dirname(SRC_DIR)
+DB_DIR = os.path.join(PROJECT_ROOT, "data")
 DB_PATH = os.path.join(DB_DIR, "reddit_data.db")
 
 # --- Data Models ---
@@ -76,7 +81,7 @@ class Comment:
 
 class PainPoint:
     """Represents a pain point extracted from a post or comment."""
-    def __init__(self, source_id: str, source_type: str, content: str, **kwargs):
+    def __init__(self, source_id: str, source_type: str, content: str, category: Optional[str] = None, **kwargs):
         """Initializes a PainPoint object.
 
         Args:
@@ -88,7 +93,7 @@ class PainPoint:
         self.source_type = source_type
         self.content = content
         # These will be populated by the NLP pipeline
-        self.category: Optional[str] = kwargs.get('category')
+        self.category: Optional[str] = category
         self.severity_score: Optional[float] = kwargs.get('severity_score')
         self.confidence_score: Optional[float] = kwargs.get('confidence_score')
         self.sentiment_score: Optional[float] = kwargs.get('sentiment_score')
@@ -299,34 +304,47 @@ def get_unprocessed_comments() -> List[Comment]:
         return [Comment(**row) for row in cursor.fetchall()]
 
 def save_pain_points(pain_points: List[PainPoint]):
-    """Saves a list of PainPoint objects to the database.
-
-    After saving the pain points, this function also marks the source posts
-    and comments as processed to avoid duplicate processing.
-
-    Args:
-        pain_points (List[PainPoint]): A list of PainPoint objects to save.
-    """
+    """Saves a list of pain points to the database."""
     if not pain_points:
         return
-        
-    pp_data = [(pp.source_id, pp.source_type, pp.content, pp.category, pp.severity_score, pp.confidence_score, pp.sentiment_score, pp.keywords, pp.subreddit, pp.engagement_score) for pp in pain_points]
-    
-    post_ids_to_mark = [pp.source_id for pp in pain_points if pp.source_type == 'post']
-    comment_ids_to_mark = [pp.source_id for pp in pain_points if pp.source_type == 'comment']
-    
-    with get_db_connection() as conn:
+
+    conn = get_db_connection()
+    try:
         cursor = conn.cursor()
-        cursor.executemany("INSERT INTO pain_points (source_id, source_type, content, category, severity_score, confidence_score, sentiment_score, keywords, subreddit, engagement_score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", pp_data)
         
-        if post_ids_to_mark:
-            placeholders = ', '.join('?' for _ in post_ids_to_mark)
-            cursor.execute(f"UPDATE posts SET processed = 1 WHERE id IN ({placeholders})", post_ids_to_mark)
-        if comment_ids_to_mark:
-            placeholders = ', '.join('?' for _ in comment_ids_to_mark)
-            cursor.execute(f"UPDATE comments SET processed = 1 WHERE id IN ({placeholders})", comment_ids_to_mark)
-            
+        # Prepare data for bulk insertion
+        pain_point_data = [
+            (
+                pp.source_id,
+                pp.source_type,
+                pp.content,
+                pp.category,
+                pp.severity_score,
+                pp.confidence_score,
+                pp.sentiment_score,
+                pp.keywords,
+                pp.subreddit,
+                pp.engagement_score,
+            )
+            for pp in pain_points
+        ]
+        
+        insert_query = """
+        INSERT INTO pain_points (
+            source_id, source_type, content, category, severity_score, 
+            confidence_score, sentiment_score, keywords, subreddit, engagement_score
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        """
+        
+        cursor.executemany(insert_query, pain_point_data)
         conn.commit()
+    except sqlite3.Error as e:
+        console.print(f"[bold red]Database error saving pain points: {e}[/bold red]")
+        conn.rollback()
+    finally:
+        conn.close()
+
 
 def get_pain_points() -> List[Dict[str, Any]]:
     """Retrieves all pain points from the database.

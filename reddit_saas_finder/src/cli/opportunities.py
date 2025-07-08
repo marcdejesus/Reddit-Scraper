@@ -1,14 +1,14 @@
 """Handles opportunity generation and scoring."""
 import typer
 from rich.console import Console
-from ml.opportunity_scorer import OpportunityScorer
-from data.database import get_pain_points, save_opportunities, Opportunity as OpportunityDB, get_opportunities
+from src.ml.opportunity_scorer import OpportunityScorer
+from src.data.database import get_pain_points, save_opportunities, Opportunity as OpportunityDB, get_opportunities
 from rich.table import Table
 
-app = typer.Typer()
+opportunities_app = typer.Typer()
 console = Console()
 
-@app.command()
+@opportunities_app.command()
 def generate(
     min_pain_points: int = typer.Option(5, "--min-points", help="Minimum number of related pain points to be considered an opportunity."),
     min_score: float = typer.Option(0.5, "--min-score", help="Minimum sentiment score for a pain point to be included.")
@@ -23,8 +23,8 @@ def generate(
             console.print("[yellow]No pain points found to analyze. Run the 'process' command first.[/yellow]")
             return
 
-        scorer = OpportunityScorer(pain_points)
-        opportunities = scorer.generate_opportunities(min_pain_points, min_score)
+        scorer = OpportunityScorer(pain_points, min_pain_points, min_score)
+        opportunities = scorer.generate_opportunities()
         
         if not opportunities:
             console.print("[yellow]No new opportunities generated based on the current criteria.[/yellow]")
@@ -36,7 +36,7 @@ def generate(
     except Exception as e:
         console.print(f"[bold red]An error occurred during opportunity generation: {e}[/bold red]")
 
-@app.command()
+@opportunities_app.command()
 def show():
     """
     Displays a table of all generated opportunities, sorted by score.
@@ -63,4 +63,4 @@ def show():
     console.print(table)
 
 if __name__ == "__main__":
-    app() 
+    opportunities_app() 

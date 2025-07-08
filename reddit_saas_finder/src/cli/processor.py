@@ -1,8 +1,9 @@
 """Handles all NLP processing tasks."""
 import typer
 from rich.console import Console
-from nlp.pain_detector import BasicPainDetector, AdvancedPainDetector
-from data.database import get_unprocessed_posts, get_unprocessed_comments, save_pain_points, PainPoint
+from src.nlp.pain_detector import BasicPainDetector, AdvancedPainDetector
+from src.nlp.categorizer import Categorizer
+from src.data.database import get_unprocessed_posts, get_unprocessed_comments, save_pain_points, PainPoint
 from typing_extensions import Annotated
 
 console = Console()
@@ -22,6 +23,7 @@ def process(
             detector = BasicPainDetector()
             console.print("[bold blue]Using basic pain point detector.[/bold blue]")
 
+        categorizer = Categorizer()
         posts = get_unprocessed_posts()
         comments = get_unprocessed_comments()
         
@@ -36,11 +38,13 @@ def process(
                     continue
                 extracted = detector.extract_pain_points(full_text)
                 for pp in extracted:
+                    category = categorizer.classify_problem_category(pp['content'])
                     pain_points_to_save.append(
                         PainPoint(
                             source_id=post.id,
                             source_type='post',
                             content=pp['content'],
+                            category=category,
                             severity_score=pp.get('confidence', 0.5),
                             confidence_score=pp.get('confidence', 0.5)
                         )
@@ -54,11 +58,13 @@ def process(
                     continue
                 extracted = detector.extract_pain_points(comment.content)
                 for pp in extracted:
+                    category = categorizer.classify_problem_category(pp['content'])
                     pain_points_to_save.append(
                         PainPoint(
                             source_id=comment.id,
                             source_type='comment',
                             content=pp['content'],
+                            category=category,
                             severity_score=pp.get('confidence', 0.5),
                             confidence_score=pp.get('confidence', 0.5)
                         )

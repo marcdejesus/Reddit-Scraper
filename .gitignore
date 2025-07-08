@@ -2,3 +2,6 @@
 .env.local
 # Local environment variables
 .env.local
+
+# Cache files
+reddit_saas_finder/cache/

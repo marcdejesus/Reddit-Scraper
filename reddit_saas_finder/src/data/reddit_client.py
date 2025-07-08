@@ -4,8 +4,8 @@ from rich.console import Console
 from datetime import datetime
 from typing import List, Dict, Any
 
-from utils.config import ConfigManager
-from data.database import save_posts_and_comments
+from src.utils.config import ConfigManager
+from src.data.database import save_posts_and_comments
 
 console = Console()
 

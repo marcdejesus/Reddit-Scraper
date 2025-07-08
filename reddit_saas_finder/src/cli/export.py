@@ -1,8 +1,8 @@
 """Handles the CLI commands for exporting data and generating reports."""
 import typer
 from rich import print
-from utils.export import DataExporter
-from data.database import get_opportunities, get_pain_points
+from src.utils.export import DataExporter
+from src.data.database import get_opportunities, get_pain_points
 from typing_extensions import Annotated
 
 exporter = DataExporter(export_dir="reddit_saas_finder/exports")
