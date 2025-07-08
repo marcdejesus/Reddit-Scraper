@@ -1,10 +1,6 @@
 MANIFEST.in
 README.md
 setup.py
-config/categories.yaml
-config/default.yaml
-config/keywords.yaml
-config/subreddits.yaml
 src/cli/__init__.py
 src/cli/config.py
 src/cli/docs.py
@@ -19,6 +15,11 @@ src/cli/scraper.py
 src/cli/trends.py
 src/cli/validator.py
 src/cli/visualization.py
+src/config/__init__.py
+src/config/categories.yaml
+src/config/default.yaml
+src/config/keywords.yaml
+src/config/subreddits.yaml
 src/data/__init__.py
 src/data/cache.py
 src/data/database.py

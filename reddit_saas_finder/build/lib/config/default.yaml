@@ -1,0 +1,50 @@
+reddit:
+  client_id: "${REDDIT_CLIENT_ID}"
+  client_secret: "${REDDIT_CLIENT_SECRET}"
+  user_agent: "reddit_saas_finder/1.0"
+  rate_limit: 60
+  retry_attempts: 5
+  backoff_factor: 2
+
+data_collection:
+  max_posts_per_subreddit: 1000
+  max_comments_per_post: 100
+  min_score_threshold: 1
+  date_range_days: 30
+  include_deleted: false
+  include_removed: false
+
+nlp:
+  sentiment_threshold: 0.7
+  confidence_threshold: 0.6
+  min_text_length: 20
+  max_text_length: 5000
+  language: "en"
+
+ml:
+  model_update_frequency: "weekly"
+  feature_importance_threshold: 0.1
+  cross_validation_folds: 5
+  test_size: 0.2
+
+scoring:
+  weights:
+    market_size: 0.3
+    frequency: 0.2
+    willingness_to_pay: 0.2
+    roi: 0.15
+    solution_gap: 0.1
+    trend_momentum: 0.05
+  
+  thresholds:
+    opportunity_min_score: 0.3
+    high_potential_score: 0.7
+    trend_significance: 0.5
+
+validation:
+  spam_score_threshold: 1
+  min_post_length: 20
+  min_comment_length: 10
+
+scheduler:
+  interval_hours: 12 

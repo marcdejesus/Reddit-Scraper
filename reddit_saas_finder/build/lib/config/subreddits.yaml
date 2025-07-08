@@ -1,0 +1,13 @@
+subreddits:
+  primary:
+    - "entrepreneur"
+    - "SaaS"
+    - "startups"
+    - "productivity"
+    - "smallbusiness"
+  secondary:
+    - "freelance"
+    - "remotework"
+    - "digitalnomad"
+    - "webdev"
+    - "marketing" 

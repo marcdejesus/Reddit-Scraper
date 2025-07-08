@@ -1,0 +1,1 @@
+"""Performs sentiment analysis on text.""" 
