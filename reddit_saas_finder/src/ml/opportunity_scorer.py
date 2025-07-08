@@ -88,9 +88,10 @@ class OpportunityScorer:
         return groups
 
     def _generate_saas_idea_title(self, pain_point_group):
-        """Generates a descriptive SaaS idea title from a group of pain points."""
+        """Generates a more specific and actionable SaaS idea title."""
         if not self.nlp:
             # Fallback for when spacy model is not loaded
+            # This remains a simple fallback, the main logic is enhanced.
             group_content = " ".join([pp['content'] for pp in pain_point_group])
             vectorizer = TfidfVectorizer(stop_words='english', max_features=5)
             vectorizer.fit([group_content])
@@ -100,43 +101,55 @@ class OpportunityScorer:
         full_text = " ".join([pp['content'] for pp in pain_point_group]).lower()
         doc = self.nlp(full_text)
 
-        # Find common nouns
-        nouns = [token.lemma_ for token in doc if token.pos_ == 'NOUN' and not token.is_stop and len(token.lemma_) > 2]
-        common_nouns = [noun for noun, count in Counter(nouns).most_common(2)]
+        # Define a list of stop words and generic phrases to ignore
+        stop_chunks = ['a waste', 'the purpose', 'some people', 'this one', 'the us', 'our work', 'job shop work']
 
-        # Find common verbs
-        verbs = [token.lemma_ for token in doc if token.pos_ == 'VERB' and not token.is_stop]
-        common_verbs = [verb for verb, count in Counter(verbs).most_common(1)]
+        # Use noun chunks to get more meaningful phrases, filtering out stop chunks
+        noun_chunks = [
+            chunk.text for chunk in doc.noun_chunks 
+            if len(chunk.text.split()) > 1 and chunk.text not in stop_chunks
+        ]
         
-        # Determine target audience
-        subreddits = [pp.get('subreddit') for pp in pain_point_group if pp.get('subreddit')]
-        audience = "Professionals" # default
-        if subreddits:
-            most_common_subreddit = Counter(subreddits).most_common(1)[0][0]
-            audience_map = {
-                'freelance': 'Freelancers',
-                'smallbusiness': 'Small Businesses',
-                'startups': 'Startups',
-                'entrepreneur': 'Entrepreneurs',
-                'marketing': 'Marketers',
-                'webdev': 'Web Developers',
-                'saas': 'SaaS Founders'
-            }
-            audience = audience_map.get(most_common_subreddit.lower(), f"{most_common_subreddit.title()}")
+        # Also get common nouns as a fallback
+        nouns = [token.lemma_ for token in doc if token.pos_ == 'NOUN' and not token.is_stop and len(token.lemma_) > 3]
 
-        if not common_nouns:
-            return "Automated Workflow & Task Management"
+        if noun_chunks:
+            common_phrases = [phrase for phrase, count in Counter(noun_chunks).most_common(2)]
+            key_concept = common_phrases[0].title()
+            
+            if len(common_phrases) > 1:
+                secondary_concept = common_phrases[1].title()
+                return f"A Platform to Streamline {key_concept} and {secondary_concept}"
+            else:
+                return f"A Tool to Automate {key_concept}"
 
-        noun1 = common_nouns[0].title()
-        
-        if len(common_nouns) > 1:
-            noun2 = common_nouns[1].title()
-            return f"AI-Powered {noun1} & {noun2} Platform for {audience}"
-        elif common_verbs:
-            verb1 = common_verbs[0].title()
-            return f"Simplified Tool for {verb1}ing {noun1} for {audience}"
+        elif nouns:
+            common_nouns = [noun for noun, count in Counter(nouns).most_common(2)]
+            key_concept = common_nouns[0].title()
+            if len(common_nouns) > 1:
+                secondary_concept = common_nouns[1].title()
+                return f"An Integrated Solution for {key_concept} and {secondary_concept}"
+            else:
+                return f"A Management Tool for {key_concept}"
         else:
-            return f"Automated {noun1} Solution for {audience}"
+            return "Automated Business Workflow Management" # Generic fallback
+
+    def _generate_opportunity_description(self, pain_point_group):
+        """Generates a summary description from the most relevant pain points."""
+        # Sort pain points by length to get more context
+        sorted_pain_points = sorted(pain_point_group, key=lambda x: len(x['content']), reverse=True)
+        
+        # Take the top 3, but no more than available
+        num_to_summarize = min(3, len(sorted_pain_points))
+        
+        description = "This opportunity addresses several user-expressed problems: "
+        
+        for i in range(num_to_summarize):
+            # Clean up the content a bit
+            clean_content = sorted_pain_points[i]['content'].replace('\n', ' ').strip()
+            description += f"({i+1}) \"{clean_content}\" "
+            
+        return description.strip()
 
     def _calculate_market_score(self, pain_point_group):
         """
@@ -198,7 +211,7 @@ class OpportunityScorer:
                     continue
 
                 title = self._generate_saas_idea_title(group)
-                description = max(group, key=lambda x: len(x['content']))['content']
+                description = self._generate_opportunity_description(group)
                 
                 # Take the most common category from the group
                 categories = [pp['category'] for pp in group if pp['category']]

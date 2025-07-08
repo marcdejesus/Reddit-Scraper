@@ -1,0 +1,6 @@
+id,title,description,category,total_score,pain_point_count,market_score,pain_point_ids
+3,An Integrated Solution for Waste and Time,"This opportunity addresses several user-expressed problems: (1) ""But if the purpose is valid, then no longer will it seem to be a waste of time."" (2) ""You just choose to sell services that aren't a waste of time."" (3) ""Waste of time""",other,0.49,3,1.0,"[29, 43, 101]"
+1,Automated Business Workflow Management,"This opportunity addresses several user-expressed problems: (1) ""They could be difficult to work with."" (2) ""Is it difficult to find?""",other,0.46,2,1.0,"[10, 80]"
+2,A Management Tool for People,"This opportunity addresses several user-expressed problems: (1) ""You won't please everyone - some people will be impossible to please."" (2) ""But, it is not impossible, nor is it everything.""",other,0.46,2,1.0,"[19, 63]"
+4,Automated Business Workflow Management,"This opportunity addresses several user-expressed problems: (1) ""Ugh that is so frustrating!!!"" (2) ""So frustrating.""",other,0.46,2,1.0,"[74, 96]"
+5,Automated Business Workflow Management,"This opportunity addresses several user-expressed problems: (1) ""He’s already impossible to avoid even if you try."" (2) ""He’s already impossible to avoid even if you try.""",other,0.46,2,1.0,"[87, 88]"

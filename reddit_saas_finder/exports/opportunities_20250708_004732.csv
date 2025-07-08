@@ -1,0 +1,97 @@
+id,title,description,category,total_score,pain_point_count,market_score,pain_point_ids
+22,AI-Powered Subscription & Software Platform for Professionals,It’s incredibly frustrating to pay for a subscription before even knowing how to use the software especially when it might take weeks or even a month to learn.,other,0.5800000000000001,2,1.0,"[25, 123]"
+14,AI-Powered Work & Job Platform for Professionals,"Our work is mostly job shop work now, but it’s difficult to find customers.",other,0.52,4,1.0,"[10, 80, 115, 164]"
+24,AI-Powered Waste & Time Platform for Professionals,"But if the purpose is valid, then no longer will it seem to be a waste of time.  
+  
+",other,0.52,4,1.0,"[29, 43, 101, 125]"
+25,AI-Powered Term & Ltv Platform for Professionals,"Ads for terms as competitive as this one are very expensive and if your LTV is below $200 (ours is at around $115), it's very difficult to achieve a positive ROI.",other,0.52,2,1.0,"[30, 126]"
+45,Automated Workflow & Task Management,Ugh that is so frustrating!!!,other,0.52,4,1.0,"[74, 96, 146, 161]"
+49,Simplified Tool for Paying Bathroom for Professionals,I’d rather pay for bathrooms than have it be practically impossible to find them like here in the US,other,0.52,2,1.0,"[78, 150]"
+54,Automated Workflow & Task Management,"He’s already impossible to avoid even if you try. 
+
+",other,0.52,4,1.0,"[87, 88, 155, 156]"
+3,AI-Powered Waste & Time Platform for Professionals,"But if the purpose is valid, then no longer will it seem to be a waste of time.  
+  
+",other,0.49,3,1.0,"[29, 43, 101]"
+15,Automated Workflow & Task Management,I know how difficult it is to get this done,other,0.49,3,1.0,"[11, 116, 173]"
+35,Automated Adhd Solution for Professionals,"But, it is not impossible, nor is it everything.",other,0.49,3,1.0,"[45, 63, 136]"
+1,Automated Workflow & Task Management,They could be difficult to work with.,other,0.46,2,1.0,"[10, 80]"
+2,Automated People Solution for Professionals,You won't please everyone - some people will be impossible to please.,other,0.46,2,1.0,"[19, 63]"
+4,Automated Workflow & Task Management,Ugh that is so frustrating!!!,other,0.46,2,1.0,"[74, 96]"
+5,Automated Workflow & Task Management,"He’s already impossible to avoid even if you try. 
+
+",other,0.46,2,1.0,"[87, 88]"
+6,Automated Workflow & Task Management,"It’s become insanely difficult to compete.
+
+",other,0.46,2,1.0,"[1, 104]"
+7,AI-Powered Wonder & Scaling Platform for Professionals,"No wonder scaling feels impossible when you're the human equivalent of a traffic jam.
+
+",other,0.46,2,1.0,"[2, 105]"
+8,AI-Powered Support & Answer Platform for Professionals,"And don’t get me started on support, sometimes it’s outsourced and impossible to get clear answers when something goes wrong.",other,0.46,2,1.0,"[3, 106]"
+9,AI-Powered Networking & Year Platform for Professionals,"5 years remote: Professional networking is broken and nobody wants to admit it TL;DR: Remote work advice loves to talk about productivity and tools, but completely ignores that informal networking - the thing that actually advances careers is basically impossible when you're never in the same room as anyone.
+
+",productivity,0.46,2,1.0,"[4, 107]"
+10,AI-Powered Marketing & Thousand Platform for Professionals,"I wanted to share about this since they use heavy referral marketing and it's difficult to cut through the thousands of fake blog posts about the insurance.
+
+",marketing,0.46,2,1.0,"[5, 108]"
+11,AI-Powered Player & Experience Platform for Professionals,Very difficult for new players to break in because of the experience the other companies have.,other,0.46,2,1.0,"[6, 113]"
+12,Simplified Tool for Going People for Professionals,"You can probably still be successful, others have, it's going to be very difficult though.",other,0.46,2,1.0,"[8, 17]"
+13,AI-Powered Time & Problem Platform for Professionals,I had had a much more difficult time not solving every problem for my customers because I was capable then I thought I should right?,other,0.46,2,1.0,"[9, 114]"
+16,AI-Powered Business & Decision Platform for Professionals,"At best, it's an inefficient business decision to not use AI.
+
+",other,0.46,2,1.0,"[13, 117]"
+17,AI-Powered Workflow & Shipping Platform for Professionals,"Not using AI to expedite workflows is inefficient, but shipping AI produced stuff without reviewing it is blatantly stupid.",productivity,0.46,2,1.0,"[14, 118]"
+18,AI-Powered Employee & Work Platform for Professionals,It's more and more difficult to grow as it gets more difficult to hire employees worth work ethic who can be trusted.,other,0.46,2,1.0,"[15, 119]"
+19,AI-Powered Author & Book Platform for Professionals,And I had shitty authors and shitty books that needed impossible amounts of editing.,other,0.46,2,1.0,"[21, 120]"
+20,AI-Powered Case & Revision Platform for Professionals,"In those cases, yes I kept asking for revisions, not to be difficult, but simply because the work wasn’t done properly.
+
+",other,0.46,2,1.0,"[22, 121]"
+21,AI-Powered Board & Couple Platform for Professionals,Well it's not unanimous across the board but I've had a couple clients that I let slide with a lower price that then refused to do stuff like testimonials and otherwise help out even after getting a good deal whereas regular paying customers I don't remember being so difficult.,other,0.46,2,1.0,"[23, 122]"
+23,AI-Powered Product & Meeting Platform for Professionals,"If you just keep your product focused on meeting note taker, that's going to be difficult to differentiate.",other,0.46,2,1.0,"[28, 124]"
+26,AI-Powered Trouble & Performance Platform for Professionals,"It is still possible to cause trouble, usually of performance kind, playing with query params, making some sql searches and queries inefficient.",other,0.46,2,1.0,"[31, 127]"
+27,AI-Powered Pseudonym & Profile Platform for Professionals,MySpace allowed pseudonyms and anonymous profiles which ultimately made it difficult to connect with people.,other,0.46,2,1.0,"[32, 128]"
+28,AI-Powered Entry & People Platform for Professionals,Also difficult entry for people who don’t know basic coding.  ,other,0.46,2,1.0,"[33, 129]"
+29,Simplified Tool for Finding Friend for Professionals,"Finding your friends was difficult at best.
+
+",other,0.46,2,1.0,"[34, 130]"
+30,AI-Powered Case & Deck Platform for Professionals,But even IF this is the case the deck is heavily stacked against success and inexperienced founders/leaders just make it even more difficult.,other,0.46,2,1.0,"[35, 131]"
+31,AI-Powered Situation & Position Platform for Professionals,"I was in this situation;
+
+It's a very difficult position to start from.",other,0.46,2,1.0,"[36, 132]"
+32,AI-Powered People & Return Platform for Professionals,"This is the difficult part because people will expect more in return for their hard work than which is realistic, which will not necessarily be possible.",other,0.46,2,1.0,"[37, 133]"
+33,AI-Powered Chatgpt & File Platform for Professionals,"This will make accessing chatgpt impossible unless you edit the file again.
+
+
+",other,0.46,2,1.0,"[38, 134]"
+34,Automated Workflow & Task Management,Look for one that makes it very difficult to unlock.,other,0.46,2,1.0,"[40, 135]"
+36,Automated Moment Solution for Professionals,"Sometimes, the most meaningful moments are the most inefficient.",other,0.46,2,1.0,"[51, 137]"
+37,AI-Powered Chore & Assignment Platform for Professionals,Studying was an absolute chore and difficult assignments were procrastinated on.,other,0.46,2,1.0,"[52, 138]"
+38,Simplified Tool for Trying Living for Professionals,Trying to make a living with real Feng Shui in the west sounds extremely difficult.,other,0.46,2,1.0,"[53, 139]"
+39,Automated Workflow & Task Management,This is actually quite difficult for me,other,0.46,2,1.0,"[54, 140]"
+40,AI-Powered Person & Advantage Platform for Professionals,"If a single person is taking advantage of being remote by being difficult to get ahold of, it will ruin it for everyone eventually.",other,0.46,2,1.0,"[58, 141]"
+41,AI-Powered Work & Relationship Platform for Professionals,But yeah it's frustrating that we have to choose between authentic work relationships and career advancement.,other,0.46,2,1.0,"[65, 142]"
+42,Automated Workflow & Task Management,Sounds like this was very difficult to navigate.,other,0.46,2,1.0,"[67, 143]"
+43,AI-Powered Immigrant & Local Platform for Professionals,Us illegal immigrants make it impossible for locals to live there.,other,0.46,2,1.0,"[70, 144]"
+44,AI-Powered Health & Service Platform for Professionals,"It's just frustrating because I literally don't use health services anywhere - I'm the best customer for insurance companies 🤣
+
+First time in five years I've even done anything other than a checkup!",other,0.46,2,1.0,"[73, 145]"
+46,AI-Powered Bathroom & Result Platform for Professionals,The result in my large city in the US after banning paid public bathrooms is that it is very difficult to find bathrooms to use.,other,0.46,2,1.0,"[75, 147]"
+47,AI-Powered Toilet & Place Platform for Professionals,It’s almost impossible to find a free public toilet in most places I have lived and visited in America.,other,0.46,2,1.0,"[76, 148]"
+48,AI-Powered Bathroom & Lot Platform for Professionals,"America used to actually have a lot of similar paid bathrooms, but some idiots decided it was unfair and campaigned against them and now it's impossible to find a clean, safe space to go to the bathroom in many cities.",other,0.46,2,1.0,"[77, 149]"
+50,AI-Powered Job & Local Platform for Professionals,They do very low-paid and difficult jobs that locals typically won’t touch.,other,0.46,2,1.0,"[79, 151]"
+51,AI-Powered Country & Society Platform for Professionals,"Yeah, it’s incredibly difficult to govern a country like Malaysia when society is so deeply divided along racial and religious lines.",other,0.46,2,1.0,"[81, 152]"
+52,AI-Powered Spanish & Time Platform for Professionals,"Even if she was fluent in Spanish, she would have had a difficult time.",other,0.46,2,1.0,"[83, 153]"
+53,AI-Powered Customer & Vibe Platform for Professionals,"Fundamentally it does nothing for the customer, is difficult to spell and has that ""trying to hard to be cool"" vibe.
+
+",other,0.46,2,1.0,"[86, 154]"
+55,AI-Powered Game & Software Platform for Professionals,"It's just too cumbersome, or sometimes flat out impossible, to run certain games and software on Linux.
+
+",other,0.46,2,1.0,"[91, 157]"
+56,Automated Time Solution for Professionals,Funny and frustrating at the same time.,other,0.46,2,1.0,"[93, 158]"
+57,Automated Client Solution for Professionals,"Unfortunately, there will always be difficult clients.",other,0.46,2,1.0,"[94, 159]"
+58,AI-Powered Sale & Business Platform for Professionals,It’s extremely frustrating because I’m in a sales led business.,other,0.46,2,1.0,"[95, 160]"
+59,AI-Powered Mistake & Freelance Platform for Professionals,I made the mistake of actually hiring a freelance photographer and it ended up being even more work and the sales people literally think of social media being a billboard so it was very very difficult to juggle everything.,marketing,0.46,2,1.0,"[98, 162]"
+60,AI-Powered Ecom & Sale Platform for Professionals,It’s especially frustrating when they’re ecom with essentially no sales dept.,other,0.46,2,1.0,"[99, 163]"
+61,AI-Powered Time & Revenue Platform for Professionals,"I lost so much time and lost revenue , it was pretty frustrating. 
+
+",other,0.46,2,1.0,"[167, 190]"

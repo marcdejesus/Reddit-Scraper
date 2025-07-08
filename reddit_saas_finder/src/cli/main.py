@@ -16,10 +16,22 @@ app = typer.Typer(
 )
 console = Console()
 
+def export_opportunities_command(
+    format: str = typer.Option("csv", "--format", "-f", help="Export format (csv, json)."),
+    output: str = typer.Option(None, "--output", "-o", help="The name of the output file.")
+):
+    """Exports all opportunities to a file."""
+    from utils.export import DataExporter
+    from data.database import get_opportunities
+    exporter = DataExporter(export_dir="exports")
+    data_to_export = get_opportunities(limit=1000)
+    exporter.export_data(data_to_export, 'opportunities', format, output)
+
 # Add subcommands from other modules
 app.add_typer(scraper_app, name="scrape")
 app.command()(process)
 app.command()(export)
+app.command("export-opportunities")(export_opportunities_command)
 app.command()(report)
 app.add_typer(opportunities_app, name="opportunities")
 app.add_typer(docs_cli.app, name="docs")
